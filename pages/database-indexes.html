@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Indexes & Relationships - HealthAI Documentation</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>HealthAI Documentation</span>
+                </div>
+                <nav class="nav">
+                    <a href="../index.html"><i class="fas fa-home"></i> Home</a>
+                    <a href="architecture.html"><i class="fas fa-sitemap"></i> Architecture</a>
+                    <a href="database.html"><i class="fas fa-database"></i> Database</a>
+                    <a href="api-docs.html"><i class="fas fa-code"></i> API Docs</a>
+                    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="layout">
+            <aside class="sidebar">
+                <div class="search-container">
+                    <input type="text" id="search" placeholder="Search...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <nav class="sidebar-nav">
+                    <a href="#indexes" class="active">Database Indexes</a>
+                    <a href="#relationships">Foreign Key Relationships</a>
+                    <a href="#constraints">Constraints & Rules</a>
+                    <a href="#optimization">Query Optimization</a>
+                    <a href="#best-practices">Best Practices</a>
+                </nav>
+            </aside>
+
+            <main class="content">
+                <section class="section" id="indexes">
+                    <h1>🗄️ Database Indexes & Relationships</h1>
+                    
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <div>
+                            <strong>Database Performance Optimization</strong>
+                            <p>Comprehensive index strategies and relationship management for optimal query performance.</p>
+                        </div>
+                    </div>
+
+                    <h2>📊 Primary Indexes</h2>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-user"></i> Users Table Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Primary Key Index (Automatic)
+CREATE UNIQUE INDEX idx_users_pk ON users(id);
+
+-- Email unique index for login
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+
+-- Phone unique index for OTP
+CREATE UNIQUE INDEX idx_users_phone ON users(phone);
+
+-- Status & Created date for filtering
+CREATE INDEX idx_users_status_created 
+ON users(status, created_at DESC);
+
+-- Full-text search on name
+CREATE INDEX idx_users_fullname_gin 
+ON users USING gin(to_tsvector('english', full_name));</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-user-circle"></i> User Profiles Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Foreign key index
+CREATE INDEX idx_profiles_user_id ON user_profiles(user_id);
+
+-- Date of birth for age filtering
+CREATE INDEX idx_profiles_dob ON user_profiles(date_of_birth);
+
+-- Location-based queries
+CREATE INDEX idx_profiles_address ON user_profiles(address);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-stethoscope"></i> Doctors Table Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Foreign key to users
+CREATE INDEX idx_doctors_user_id ON doctors(user_id);
+
+-- Specialty filtering
+CREATE INDEX idx_doctors_specialty ON doctors(specialty);
+
+-- Verification status
+CREATE INDEX idx_doctors_verified ON doctors(is_verified);
+
+-- Hospital assignment
+CREATE INDEX idx_doctors_hospital_id ON doctors(hospital_id);
+
+-- Composite index for availability search
+CREATE INDEX idx_doctors_specialty_verified_hospital 
+ON doctors(specialty, is_verified, hospital_id) 
+WHERE is_verified = true;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-calendar-check"></i> Appointments Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- User's appointments
+CREATE INDEX idx_appointments_user_id 
+ON appointments(user_id);
+
+-- Doctor's appointments
+CREATE INDEX idx_appointments_doctor_id 
+ON appointments(doctor_id);
+
+-- Status filtering
+CREATE INDEX idx_appointments_status 
+ON appointments(status);
+
+-- Date range queries (most important!)
+CREATE INDEX idx_appointments_date 
+ON appointments(appointment_date);
+
+-- Composite index for doctor schedule
+CREATE INDEX idx_appointments_doctor_date_status 
+ON appointments(doctor_id, appointment_date, status);
+
+-- Composite index for user appointments list
+CREATE INDEX idx_appointments_user_date_status 
+ON appointments(user_id, appointment_date DESC, status);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-heartbeat"></i> Vital Signs Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- User's vital signs history
+CREATE INDEX idx_vital_signs_user_id 
+ON vital_signs(user_id);
+
+-- Date range for trend analysis
+CREATE INDEX idx_vital_signs_measured_at 
+ON vital_signs(measured_at DESC);
+
+-- Composite for user timeline
+CREATE INDEX idx_vital_signs_user_date 
+ON vital_signs(user_id, measured_at DESC);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-notes-medical"></i> Medical History Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- User's medical history
+CREATE INDEX idx_medical_history_user_id 
+ON medical_history(user_id);
+
+-- Diagnosis search
+CREATE INDEX idx_medical_history_diagnosis 
+ON medical_history(diagnosis);
+
+-- Date filtering
+CREATE INDEX idx_medical_history_diagnosis_date 
+ON medical_history(diagnosis_date DESC);
+
+-- Full-text search on diagnosis and treatment
+CREATE INDEX idx_medical_history_fulltext 
+ON medical_history USING gin(
+    to_tsvector('english', 
+        diagnosis || ' ' || treatment || ' ' || notes
+    )
+);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-pills"></i> Products (Pharmacy) Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Category filtering
+CREATE INDEX idx_products_category ON products(category);
+
+-- Stock availability
+CREATE INDEX idx_products_stock ON products(stock_quantity);
+
+-- Price range queries
+CREATE INDEX idx_products_price ON products(price);
+
+-- Active products only
+CREATE INDEX idx_products_active 
+ON products(is_active) WHERE is_active = true;
+
+-- Composite for product listing
+CREATE INDEX idx_products_category_active_price 
+ON products(category, is_active, price) 
+WHERE is_active = true;
+
+-- Full-text search on product name and description
+CREATE INDEX idx_products_fulltext 
+ON products USING gin(
+    to_tsvector('english', name || ' ' || description)
+);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-shopping-cart"></i> Orders Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- User's orders
+CREATE INDEX idx_orders_user_id ON orders(user_id);
+
+-- Order status
+CREATE INDEX idx_orders_status ON orders(status);
+
+-- Date range for reports
+CREATE INDEX idx_orders_created_at 
+ON orders(created_at DESC);
+
+-- Payment status tracking
+CREATE INDEX idx_orders_payment_status 
+ON orders(payment_status);
+
+-- Composite for user order history
+CREATE INDEX idx_orders_user_date_status 
+ON orders(user_id, created_at DESC, status);</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-prescription"></i> Prescriptions Indexes</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Appointment reference
+CREATE INDEX idx_prescriptions_appointment_id 
+ON prescriptions(appointment_id);
+
+-- Doctor's prescriptions
+CREATE INDEX idx_prescriptions_doctor_id 
+ON prescriptions(doctor_id);
+
+-- User's prescriptions
+CREATE INDEX idx_prescriptions_user_id 
+ON prescriptions(user_id);
+
+-- Validity date
+CREATE INDEX idx_prescriptions_valid_until 
+ON prescriptions(valid_until);
+
+-- Active prescriptions
+CREATE INDEX idx_prescriptions_user_valid 
+ON prescriptions(user_id, valid_until) 
+WHERE valid_until >= CURRENT_DATE;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" id="relationships">
+                    <h2>🔗 Foreign Key Relationships</h2>
+
+                    <div class="card">
+                        <h3>Entity Relationship Diagram</h3>
+                        <div class="mermaid-container">
+                            <pre class="mermaid">
+erDiagram
+    users ||--o| user_profiles : has
+    users ||--o| doctors : "can be"
+    users ||--o{ appointments : books
+    users ||--o{ vital_signs : records
+    users ||--o{ medical_history : has
+    users ||--o{ orders : places
+    users ||--o{ prescriptions : receives
+    
+    doctors ||--o{ appointments : accepts
+    doctors ||--o{ prescriptions : writes
+    doctors }o--|| hospitals : "works at"
+    
+    appointments ||--o| prescriptions : generates
+    appointments }o--|| hospitals : "scheduled at"
+    
+    orders ||--o{ order_items : contains
+    products ||--o{ order_items : "included in"
+    
+    prescriptions ||--o{ prescription_items : contains
+    products ||--o{ prescription_items : "prescribed as"
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Foreign Key Constraints</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- user_profiles → users
+ALTER TABLE user_profiles 
+ADD CONSTRAINT fk_profiles_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- doctors → users
+ALTER TABLE doctors 
+ADD CONSTRAINT fk_doctors_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- doctors → hospitals
+ALTER TABLE doctors 
+ADD CONSTRAINT fk_doctors_hospital 
+FOREIGN KEY (hospital_id) REFERENCES hospitals(id) 
+ON DELETE SET NULL;
+
+-- appointments → users
+ALTER TABLE appointments 
+ADD CONSTRAINT fk_appointments_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- appointments → doctors
+ALTER TABLE appointments 
+ADD CONSTRAINT fk_appointments_doctor 
+FOREIGN KEY (doctor_id) REFERENCES doctors(id) 
+ON DELETE RESTRICT;
+
+-- appointments → hospitals
+ALTER TABLE appointments 
+ADD CONSTRAINT fk_appointments_hospital 
+FOREIGN KEY (hospital_id) REFERENCES hospitals(id) 
+ON DELETE RESTRICT;
+
+-- vital_signs → users
+ALTER TABLE vital_signs 
+ADD CONSTRAINT fk_vital_signs_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- medical_history → users
+ALTER TABLE medical_history 
+ADD CONSTRAINT fk_medical_history_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- orders → users
+ALTER TABLE orders 
+ADD CONSTRAINT fk_orders_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;
+
+-- prescriptions → appointments
+ALTER TABLE prescriptions 
+ADD CONSTRAINT fk_prescriptions_appointment 
+FOREIGN KEY (appointment_id) REFERENCES appointments(id) 
+ON DELETE CASCADE;
+
+-- prescriptions → doctors
+ALTER TABLE prescriptions 
+ADD CONSTRAINT fk_prescriptions_doctor 
+FOREIGN KEY (doctor_id) REFERENCES doctors(id) 
+ON DELETE RESTRICT;
+
+-- prescriptions → users
+ALTER TABLE prescriptions 
+ADD CONSTRAINT fk_prescriptions_user 
+FOREIGN KEY (user_id) REFERENCES users(id) 
+ON DELETE CASCADE;</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" id="constraints">
+                    <h2>✅ Constraints & Rules</h2>
+
+                    <div class="card">
+                        <h3>Check Constraints</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Users table constraints
+ALTER TABLE users 
+ADD CONSTRAINT chk_users_email 
+CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$');
+
+ALTER TABLE users 
+ADD CONSTRAINT chk_users_phone 
+CHECK (phone ~ '^\d{10,11}$');
+
+ALTER TABLE users 
+ADD CONSTRAINT chk_users_status 
+CHECK (status IN ('active', 'inactive', 'suspended', 'deleted'));
+
+-- Vital signs constraints
+ALTER TABLE vital_signs 
+ADD CONSTRAINT chk_vital_signs_ranges 
+CHECK (
+    heart_rate BETWEEN 30 AND 250 AND
+    systolic_bp BETWEEN 70 AND 250 AND
+    diastolic_bp BETWEEN 40 AND 150 AND
+    temperature BETWEEN 30.0 AND 45.0 AND
+    weight > 0 AND
+    height > 0
+);
+
+-- Appointments constraints
+ALTER TABLE appointments 
+ADD CONSTRAINT chk_appointments_status 
+CHECK (status IN ('scheduled', 'confirmed', 'completed', 'cancelled', 'no_show'));
+
+ALTER TABLE appointments 
+ADD CONSTRAINT chk_appointments_future_date 
+CHECK (appointment_date >= CURRENT_DATE);
+
+-- Products constraints
+ALTER TABLE products 
+ADD CONSTRAINT chk_products_price 
+CHECK (price >= 0);
+
+ALTER TABLE products 
+ADD CONSTRAINT chk_products_stock 
+CHECK (stock_quantity >= 0);
+
+-- Orders constraints
+ALTER TABLE orders 
+ADD CONSTRAINT chk_orders_total 
+CHECK (total_amount > 0);
+
+ALTER TABLE orders 
+ADD CONSTRAINT chk_orders_status 
+CHECK (status IN ('pending', 'processing', 'shipped', 'delivered', 'cancelled'));
+
+ALTER TABLE orders 
+ADD CONSTRAINT chk_orders_payment_status 
+CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded'));</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Unique Constraints</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Email and phone must be unique
+ALTER TABLE users 
+ADD CONSTRAINT uq_users_email UNIQUE (email);
+
+ALTER TABLE users 
+ADD CONSTRAINT uq_users_phone UNIQUE (phone);
+
+-- One profile per user
+ALTER TABLE user_profiles 
+ADD CONSTRAINT uq_profiles_user_id UNIQUE (user_id);
+
+-- One doctor record per user
+ALTER TABLE doctors 
+ADD CONSTRAINT uq_doctors_user_id UNIQUE (user_id);
+
+-- License number unique for doctors
+ALTER TABLE doctors 
+ADD CONSTRAINT uq_doctors_license UNIQUE (license_number);</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" id="optimization">
+                    <h2>⚡ Query Optimization Strategies</h2>
+
+                    <div class="card">
+                        <h3>Common Query Patterns & Optimizations</h3>
+                        
+                        <h4>1. User Login Query</h4>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Optimized with idx_users_email
+EXPLAIN ANALYZE
+SELECT id, email, password_hash, status 
+FROM users 
+WHERE email = 'user@example.com' AND status = 'active';
+
+-- Index Scan on idx_users_email
+-- Execution time: ~0.5ms</code></pre>
+                        </div>
+
+                        <h4>2. Doctor Search Query</h4>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Optimized with idx_doctors_specialty_verified_hospital
+EXPLAIN ANALYZE
+SELECT d.*, u.full_name, h.name as hospital_name
+FROM doctors d
+JOIN users u ON d.user_id = u.id
+JOIN hospitals h ON d.hospital_id = h.id
+WHERE d.specialty = 'Cardiology'
+  AND d.is_verified = true
+  AND h.city = 'Ho Chi Minh'
+ORDER BY d.years_experience DESC
+LIMIT 20;
+
+-- Bitmap Index Scan on idx_doctors_specialty_verified_hospital
+-- Execution time: ~2ms</code></pre>
+                        </div>
+
+                        <h4>3. Appointment Listing Query</h4>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Optimized with idx_appointments_user_date_status
+EXPLAIN ANALYZE
+SELECT a.*, d.full_name as doctor_name, h.name as hospital_name
+FROM appointments a
+JOIN doctors doc ON a.doctor_id = doc.id
+JOIN users d ON doc.user_id = d.id
+JOIN hospitals h ON a.hospital_id = h.id
+WHERE a.user_id = 'user-uuid'
+  AND a.status IN ('scheduled', 'confirmed')
+ORDER BY a.appointment_date DESC
+LIMIT 10;
+
+-- Index Scan using idx_appointments_user_date_status
+-- Execution time: ~1.5ms</code></pre>
+                        </div>
+
+                        <h4>4. Product Search Query</h4>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Full-text search with idx_products_fulltext
+EXPLAIN ANALYZE
+SELECT id, name, description, price, stock_quantity
+FROM products
+WHERE to_tsvector('english', name || ' ' || description) 
+      @@ to_tsquery('english', 'pain & relief')
+  AND is_active = true
+  AND stock_quantity > 0
+ORDER BY price ASC
+LIMIT 20;
+
+-- Bitmap Index Scan on idx_products_fulltext
+-- Execution time: ~5ms</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Partition Strategy for Large Tables</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Partition appointments by year
+CREATE TABLE appointments_2024 PARTITION OF appointments
+FOR VALUES FROM ('2024-01-01') TO ('2025-01-01');
+
+CREATE TABLE appointments_2025 PARTITION OF appointments
+FOR VALUES FROM ('2025-01-01') TO ('2026-01-01');
+
+-- Partition orders by month
+CREATE TABLE orders_2024_10 PARTITION OF orders
+FOR VALUES FROM ('2024-10-01') TO ('2024-11-01');
+
+CREATE TABLE orders_2024_11 PARTITION OF orders
+FOR VALUES FROM ('2024-11-01') TO ('2024-12-01');</code></pre>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="section" id="best-practices">
+                    <h2>📚 Best Practices</h2>
+
+                    <div class="card">
+                        <h3>Index Maintenance</h3>
+                        <ul>
+                            <li><strong>VACUUM</strong>: Run weekly to reclaim storage and update statistics</li>
+                            <li><strong>REINDEX</strong>: Monthly for heavily updated tables</li>
+                            <li><strong>ANALYZE</strong>: After bulk inserts/updates to update query planner statistics</li>
+                        </ul>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Vacuum and analyze all tables
+VACUUM ANALYZE;
+
+-- Reindex specific table
+REINDEX TABLE appointments;
+
+-- Update statistics
+ANALYZE appointments;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Performance Monitoring</h3>
+                        <div class="code-block">
+                            <pre><code class="language-sql">-- Find slow queries
+SELECT query, mean_exec_time, calls
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 10;
+
+-- Check index usage
+SELECT schemaname, tablename, indexname, idx_scan, idx_tup_read, idx_tup_fetch
+FROM pg_stat_user_indexes
+WHERE idx_scan = 0
+ORDER BY schemaname, tablename;
+
+-- Table sizes
+SELECT tablename, 
+       pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
+FROM pg_tables
+WHERE schemaname = 'public'
+ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>Key Takeaways</strong>
+                            <ul>
+                                <li>Always index foreign keys for JOIN performance</li>
+                                <li>Composite indexes for frequently combined WHERE clauses</li>
+                                <li>Use partial indexes for selective queries</li>
+                                <li>Monitor and analyze slow queries regularly</li>
+                                <li>Consider partitioning for time-series data</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 HealthAI Documentation. Built with ❤️ by AI Team.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

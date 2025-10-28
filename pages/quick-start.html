@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Start Guide - HealthAI App</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="../index.html" class="nav-link">Trang chủ</a>
+                    <a href="architecture.html" class="nav-link">Kiến trúc</a>
+                    <a href="functional-flows.html" class="nav-link">Chức năng</a>
+                    <a href="api-docs.html" class="nav-link">API</a>
+                    <a href="database.html" class="nav-link">Database</a>
+                    <a href="quick-start.html" class="nav-link active">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Setup Guide</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#prerequisites" class="sidebar-link">Prerequisites</a></li>
+                    <li class="sidebar-item"><a href="#backend" class="sidebar-link">Backend Setup</a></li>
+                    <li class="sidebar-item"><a href="#frontend" class="sidebar-link">Frontend Setup</a></li>
+                    <li class="sidebar-item"><a href="#database" class="sidebar-link">Database Setup</a></li>
+                    <li class="sidebar-item"><a href="#run" class="sidebar-link">Run Project</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="content-section fade-in">
+                <h1 class="page-title">⚡ Quick Start Guide</h1>
+                <p class="page-subtitle">Hướng dẫn setup và chạy HealthAI App trong 15 phút</p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-clock"></i>
+                    <strong>Thời gian:</strong> ~15 phút | <strong>Yêu cầu:</strong> Java 17+, Node.js 18+, Docker
+                </div>
+            </section>
+
+            <section id="prerequisites" class="content-section">
+                <div class="card">
+                    <h2>📋 Prerequisites</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Version</th>
+                                    <th>Download</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Java JDK</strong></td>
+                                    <td>17 or higher</td>
+                                    <td><a href="https://adoptium.net/" target="_blank">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Maven</strong></td>
+                                    <td>3.8+</td>
+                                    <td><a href="https://maven.apache.org/" target="_blank">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Node.js</strong></td>
+                                    <td>18+</td>
+                                    <td><a href="https://nodejs.org/" target="_blank">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PostgreSQL</strong></td>
+                                    <td>14+</td>
+                                    <td><a href="https://www.postgresql.org/" target="_blank">Download</a></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Docker</strong></td>
+                                    <td>Latest</td>
+                                    <td><a href="https://www.docker.com/" target="_blank">Download</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="backend" class="content-section">
+                <div class="card">
+                    <h2>🔧 Backend Setup (Spring Boot)</h2>
+                    
+                    <h3>1. Clone Repository</h3>
+                    <pre><code>git clone https://github.com/your-org/healthai-backend.git
+cd healthai-backend</code></pre>
+
+                    <h3>2. Configure Database</h3>
+                    <p>Edit <code>src/main/resources/application.yml</code>:</p>
+                    <pre><code>spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/healthai_db
+    username: postgres
+    password: your_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  redis:
+    host: localhost
+    port: 6379
+
+openai:
+  api:
+    key: your-openai-api-key
+
+vnpay:
+  tmnCode: your-tmn-code
+  hashSecret: your-hash-secret</code></pre>
+
+                    <h3>3. Install Dependencies</h3>
+                    <pre><code>mvn clean install</code></pre>
+
+                    <h3>4. Run Services</h3>
+                    <pre><code># Run Auth Service
+cd auth-service
+mvn spring-boot:run
+
+# Run User Service
+cd ../user-service
+mvn spring-boot:run
+
+# Run AI Service
+cd ../ai-service
+python app.py</code></pre>
+                </div>
+            </section>
+
+            <section id="frontend" class="content-section">
+                <div class="card">
+                    <h2>🎨 Frontend Setup</h2>
+                    
+                    <h3>React Web App</h3>
+                    <pre><code>cd healthai-web
+npm install
+npm start</code></pre>
+
+                    <h3>Flutter Mobile App</h3>
+                    <pre><code>cd healthai-mobile
+flutter pub get
+flutter run</code></pre>
+                </div>
+            </section>
+
+            <section id="database" class="content-section">
+                <div class="card">
+                    <h2>💾 Database Setup</h2>
+                    
+                    <h3>Using Docker Compose</h3>
+                    <pre><code>docker-compose up -d</code></pre>
+
+                    <p>Or manual setup:</p>
+                    <pre><code># PostgreSQL
+createdb healthai_db
+psql healthai_db < schema.sql
+
+# Redis
+docker run -d -p 6379:6379 redis:latest
+
+# MongoDB
+docker run -d -p 27017:27017 mongo:latest</code></pre>
+                </div>
+            </section>
+
+            <section id="run" class="content-section">
+                <div class="card">
+                    <h2>🚀 Run Complete Stack</h2>
+                    
+                    <h3>Using Docker Compose (Recommended)</h3>
+                    <pre><code>docker-compose up -d</code></pre>
+
+                    <h3>Access URLs</h3>
+                    <ul>
+                        <li><strong>Web App:</strong> <a href="http://localhost:3000">http://localhost:3000</a></li>
+                        <li><strong>API Gateway:</strong> <a href="http://localhost:8080">http://localhost:8080</a></li>
+                        <li><strong>Auth Service:</strong> <a href="http://localhost:8081">http://localhost:8081</a></li>
+                        <li><strong>AI Service:</strong> <a href="http://localhost:5000">http://localhost:5000</a></li>
+                    </ul>
+
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Setup Complete!</strong> Bạn có thể bắt đầu phát triển.
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HealthAI App Documentation</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

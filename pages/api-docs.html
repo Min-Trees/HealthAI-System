@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - HealthAI App</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="../index.html" class="nav-link">Trang chủ</a>
+                    <a href="architecture.html" class="nav-link">Kiến trúc</a>
+                    <a href="functional-flows.html" class="nav-link">Chức năng</a>
+                    <a href="api-docs.html" class="nav-link active">API</a>
+                    <a href="database.html" class="nav-link">Database</a>
+                    <a href="quick-start.html" class="nav-link">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Services</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#auth" class="sidebar-link">Auth Service</a></li>
+                    <li class="sidebar-item"><a href="#user" class="sidebar-link">User Service</a></li>
+                    <li class="sidebar-item"><a href="#ai" class="sidebar-link">AI Service</a></li>
+                    <li class="sidebar-item"><a href="#appointment" class="sidebar-link">Appointment</a></li>
+                    <li class="sidebar-item"><a href="#payment" class="sidebar-link">Payment</a></li>
+                    <li class="sidebar-item"><a href="#chat-video" class="sidebar-link">Chat & Video Call</a></li>
+                    <li class="sidebar-item"><a href="#store" class="sidebar-link">Store/Pharmacy</a></li>
+                    <li class="sidebar-item"><a href="#inventory" class="sidebar-link">Inventory Management</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="content-section fade-in">
+                <h1 class="page-title">📡 API Documentation</h1>
+                <p class="page-subtitle">RESTful API Endpoints cho HealthAI App - 85+ APIs</p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Base URL:</strong> https://api.healthai.com/v1
+                </div>
+            </section>
+
+            <!-- Auth Service APIs -->
+            <section id="auth" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🔐 Auth Service</h2>
+                        <span class="card-badge">Port: 8081</span>
+                    </div>
+
+                    <h3>POST /auth/register</h3>
+                    <p>Đăng ký tài khoản mới với xác thực OTP</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "email": "user@example.com",
+  "phone": "0987654321",
+  "password": "SecurePass123!",
+  "fullName": "Nguyen Van A",
+  "dob": "1990-01-15",
+  "address": "123 Tran Hung Dao St, HCMC",
+  "acceptTerms": true
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "message": "OTP sent to your phone",
+  "otpToken": "uuid-token-xxx",
+  "expiresIn": 300,
+  "maskedPhone": "098***321"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /auth/otp/verify</h3>
+                    <p>Xác thực OTP code</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "otpToken": "uuid-token-xxx",
+  "code": "123456",
+  "email": "user@example.com",
+  "phone": "0987654321"
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": 3600,
+  "user": {
+    "id": "user-uuid",
+    "email": "user@example.com",
+    "fullName": "Nguyen Van A",
+    "role": "PATIENT"
+  }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /auth/login</h3>
+                    <p>Đăng nhập với email/phone và password</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "emailOrPhone": "user@example.com",
+  "password": "SecurePass123!"
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": 3600,
+  "user": {
+    "id": "user-uuid",
+    "email": "user@example.com",
+    "fullName": "Nguyen Van A",
+    "role": "PATIENT",
+    "isVerified": true
+  }
+}</code></pre>
+
+                    <h4>Error Codes:</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Message</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-danger">400</span></td>
+                                    <td>INVALID_CREDENTIALS</td>
+                                    <td>Email/password không đúng</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-danger">401</span></td>
+                                    <td>UNAUTHORIZED</td>
+                                    <td>Token không hợp lệ hoặc hết hạn</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-warning">409</span></td>
+                                    <td>USER_EXISTS</td>
+                                    <td>Email/phone đã được đăng ký</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-warning">429</span></td>
+                                    <td>TOO_MANY_REQUESTS</td>
+                                    <td>Vượt quá giới hạn request</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Service APIs -->
+            <section id="ai" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">🤖 AI Diagnosis Service</h2>
+                        <span class="card-badge">Port: 5000</span>
+                    </div>
+
+                    <h3>POST /ai/chat</h3>
+                    <p>Phân tích triệu chứng và đưa ra chẩn đoán sơ bộ</p>
+                    
+                    <h4>Headers:</h4>
+                    <pre><code>Authorization: Bearer {accessToken}
+Content-Type: application/json</code></pre>
+
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "symptoms": "Đau đầu, sốt cao 38.5 độ, mệt mỏi",
+  "duration": "3 ngày",
+  "severity": "medium",
+  "vitalSigns": {
+    "heartRate": 85,
+    "bloodPressure": "120/80",
+    "temperature": 38.5,
+    "respiratoryRate": 18
+  },
+  "medicalHistory": [
+    {
+      "disease": "Tiểu đường",
+      "diagnosedDate": "2020-05-15",
+      "status": "controlled"
+    }
+  ]
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "diagnosisId": "diag-uuid",
+  "timestamp": "2025-10-28T10:30:00Z",
+  "analysis": {
+    "possibleConditions": [
+      {
+        "name": "Cảm cúm (Influenza)",
+        "probability": 0.75,
+        "description": "Nhiễm virus cúm với triệu chứng sốt cao, đau đầu"
+      },
+      {
+        "name": "Nhiễm trùng đường hô hấp",
+        "probability": 0.60,
+        "description": "Có thể do virus hoặc vi khuẩn"
+      }
+    ],
+    "riskLevel": "MEDIUM",
+    "recommendations": [
+      "Nghỉ ngơi đầy đủ",
+      "Uống nhiều nước",
+      "Theo dõi nhiệt độ",
+      "Nếu sốt trên 39°C hoặc kéo dài > 3 ngày, hãy đến bệnh viện"
+    ],
+    "urgency": "CONSULT_DOCTOR_WITHIN_24H"
+  },
+  "nextSteps": {
+    "shouldSeeDoctor": true,
+    "specialty": "Nội khoa",
+    "estimatedWaitTime": "2-4 giờ",
+    "bookingUrl": "/api/v1/appointments/search?specialty=INTERNAL_MEDICINE"
+  }
+}</code></pre>
+
+                    <div class="alert alert-warning mt-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Lưu ý:</strong> AI chỉ cung cấp chẩn đoán sơ bộ, không thay thế ý kiến bác sĩ.
+                    </div>
+                </div>
+            </section>
+
+            <!-- User Service APIs -->
+            <section id="user" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">👤 User Service</h2>
+                        <span class="card-badge">Port: 8082</span>
+                    </div>
+
+                    <h3>GET /users/profile</h3>
+                    <p>Lấy thông tin profile người dùng</p>
+                    
+                    <h4>Headers:</h4>
+                    <pre><code>Authorization: Bearer {accessToken}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "id": "user-uuid",
+  "email": "user@example.com",
+  "phone": "0987654321",
+  "fullName": "Nguyen Van A",
+  "dob": "1990-01-15",
+  "gender": "male",
+  "address": "123 Tran Hung Dao St, HCMC",
+  "avatarUrl": "https://cdn.healthai.com/avatars/user.jpg",
+  "emergencyContact": "0912345678",
+  "medicalHistory": [
+    {
+      "disease": "Tiểu đường",
+      "diagnosedDate": "2020-05-15",
+      "status": "controlled"
+    }
+  ],
+  "createdAt": "2024-01-01T00:00:00Z"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>PUT /users/profile</h3>
+                    <p>Cập nhật thông tin profile</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "fullName": "Nguyen Van A Updated",
+  "address": "456 New Street, HCMC",
+  "emergencyContact": "0998765432"
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "success": true,
+  "message": "Profile updated successfully",
+  "user": { /* updated user object */ }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /users/vital-signs</h3>
+                    <p>Thêm chỉ số sức khỏe hàng ngày</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "heartRate": 75,
+  "bloodPressure": "120/80",
+  "temperature": 36.5,
+  "respiratoryRate": 16,
+  "weight": 70.5,
+  "height": 175,
+  "measuredAt": "2025-10-28T08:00:00Z"
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "id": "vital-uuid",
+  "message": "Vital signs recorded",
+  "analysis": {
+    "status": "NORMAL",
+    "alerts": []
+  }
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Appointment Service APIs -->
+            <section id="appointment" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📅 Appointment Service</h2>
+                        <span class="card-badge">Port: 8083</span>
+                    </div>
+
+                    <h3>GET /appointments/doctors</h3>
+                    <p>Tìm kiếm bác sĩ theo chuyên khoa</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>specialty: string (CARDIOLOGY, INTERNAL_MEDICINE, PEDIATRICS, etc.)
+available: boolean
+location: string (coordinates or city name)</code></pre>
+
+                    <h4>Example Request:</h4>
+                    <pre><code>GET /api/v1/appointments/doctors?specialty=CARDIOLOGY&available=true&location=HCMC</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 15,
+  "doctors": [
+    {
+      "id": "doctor-uuid",
+      "name": "Dr. Tran Van B",
+      "specialty": "CARDIOLOGY",
+      "licenseNumber": "ABC123456",
+      "experience": "15 years",
+      "rating": 4.8,
+      "reviewCount": 234,
+      "hospital": {
+        "id": "hospital-uuid",
+        "name": "Cho Ray Hospital",
+        "address": "201B Nguyen Chi Thanh, HCMC",
+        "distance": 2.5
+      },
+      "availableSlots": [
+        {
+          "date": "2025-10-29",
+          "slots": ["09:00", "10:30", "14:00", "15:30"]
+        },
+        {
+          "date": "2025-10-30",
+          "slots": ["09:00", "11:00", "13:00"]
+        }
+      ],
+      "consultationFee": 300000
+    }
+  ]
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /appointments/book</h3>
+                    <p>Đặt lịch hẹn với bác sĩ</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "doctorId": "doctor-uuid",
+  "appointmentDate": "2025-10-29T09:00:00Z",
+  "reason": "Khám tổng quát",
+  "notes": "Đau ngực từ 2 ngày nay",
+  "type": "VIDEO_CALL" // or "IN_PERSON"
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "id": "appointment-uuid",
+  "status": "CONFIRMED",
+  "appointmentDate": "2025-10-29T09:00:00Z",
+  "doctor": { /* doctor info */ },
+  "patient": { /* patient info */ },
+  "videoCallLink": "https://meet.healthai.com/room-uuid",
+  "qrCode": "data:image/png;base64,..."
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /appointments/my-appointments</h3>
+                    <p>Lấy danh sách lịch hẹn của người dùng</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>status: string (PENDING, CONFIRMED, COMPLETED, CANCELLED)
+from: date
+to: date
+page: number
+limit: number</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 5,
+  "page": 1,
+  "limit": 10,
+  "appointments": [
+    {
+      "id": "appointment-uuid",
+      "doctorName": "Dr. Tran Van B",
+      "specialty": "CARDIOLOGY",
+      "appointmentDate": "2025-10-29T09:00:00Z",
+      "status": "CONFIRMED",
+      "type": "VIDEO_CALL"
+    }
+  ]
+}</code></pre>
+
+                    <hr>
+
+                    <h3>PUT /appointments/{id}/cancel</h3>
+                    <p>Hủy lịch hẹn</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "reason": "Có việc đột xuất"
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "success": true,
+  "message": "Appointment cancelled",
+  "refundAmount": 300000
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Payment Service APIs -->
+            <section id="payment" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">💳 Payment Service</h2>
+                        <span class="card-badge">Port: 8084</span>
+                    </div>
+
+                    <h3>POST /payments/vnpay/create</h3>
+                    <p>Tạo link thanh toán VNPAY</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "orderId": "order-uuid",
+  "amount": 500000,
+  "orderInfo": "Thanh toán đơn thuốc #12345",
+  "returnUrl": "https://healthai.com/payment/callback",
+  "locale": "vn"
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "paymentUrl": "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html?vnp_Amount=...",
+  "transactionId": "txn-uuid",
+  "expiresAt": "2025-10-28T11:00:00Z"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /payments/{transactionId}/status</h3>
+                    <p>Kiểm tra trạng thái thanh toán</p>
+                    
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "transactionId": "txn-uuid",
+  "status": "SUCCESS", // or PENDING, FAILED
+  "amount": 500000,
+  "paymentMethod": "VNPAY",
+  "paidAt": "2025-10-28T10:35:00Z",
+  "orderId": "order-uuid"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /payments/history</h3>
+                    <p>Lịch sử giao dịch</p>
+                    
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 25,
+  "transactions": [
+    {
+      "id": "txn-uuid",
+      "amount": 500000,
+      "status": "SUCCESS",
+      "description": "Thanh toán đơn thuốc #12345",
+      "createdAt": "2025-10-28T10:30:00Z"
+    }
+  ]
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Store/Pharmacy Service APIs -->
+            <section id="store" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">💊 Store/Pharmacy Service</h2>
+                        <span class="card-badge">Port: 8085</span>
+                    </div>
+
+                    <h3>GET /products</h3>
+                    <p>Danh sách sản phẩm thuốc</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>category: string (OTC, PRESCRIPTION, SUPPLEMENT)
+search: string
+page: number
+limit: number</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 150,
+  "products": [
+    {
+      "id": "product-uuid",
+      "name": "Paracetamol 500mg",
+      "description": "Giảm đau, hạ sốt",
+      "price": 25000,
+      "stock": 500,
+      "category": "OTC",
+      "barcode": "8936012345678",
+      "imageUrl": "https://cdn.healthai.com/products/paracetamol.jpg",
+      "requiresPrescription": false
+    }
+  ]
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /cart/add</h3>
+                    <p>Thêm sản phẩm vào giỏ hàng</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "productId": "product-uuid",
+  "quantity": 2
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "success": true,
+  "cart": {
+    "items": [
+      {
+        "productId": "product-uuid",
+        "name": "Paracetamol 500mg",
+        "quantity": 2,
+        "price": 25000,
+        "subtotal": 50000
+      }
+    ],
+    "totalItems": 2,
+    "totalAmount": 50000
+  }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /orders/create</h3>
+                    <p>Tạo đơn hàng</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "cartItems": [/* cart items */],
+  "deliveryAddress": "123 Street, HCMC",
+  "deliveryNote": "Gọi trước khi giao",
+  "paymentMethod": "VNPAY"
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "orderId": "order-uuid",
+  "totalAmount": 550000,
+  "status": "PENDING_PAYMENT",
+  "estimatedDelivery": "2025-10-30T00:00:00Z",
+  "paymentUrl": "https://vnpay.vn/..."
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Chat & Video Call Service -->
+            <section class="content-section" id="chat-video">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">💬 Chat & Video Call Service</h2>
+                        <span class="card-badge">Port: 8089</span>
+                    </div>
+                    
+                    <div class="info-box">
+                        <strong>📌 Technology Stack:</strong>
+                        <ul>
+                            <li><strong>Chat:</strong> WebSocket (Socket.IO) + Redis PubSub</li>
+                            <li><strong>Video Call:</strong> WebRTC + Jitsi Meet / Agora.io</li>
+                            <li><strong>Real-time:</strong> Server-Sent Events (SSE) cho notifications</li>
+                        </ul>
+                    </div>
+
+                    <hr>
+
+                    <h3>POST /chat/conversations/create</h3>
+                    <p>Tạo cuộc trò chuyện mới với bác sĩ</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "doctorId": "doctor-uuid",
+  "appointmentId": "appointment-uuid", // Optional: link to appointment
+  "initialMessage": "Xin chào bác sĩ, tôi cần tư vấn về..."
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "conversationId": "conv-uuid",
+  "doctorId": "doctor-uuid",
+  "doctorName": "BS. Nguyen Van A",
+  "status": "ACTIVE",
+  "createdAt": "2025-10-28T14:30:00Z",
+  "lastMessage": {
+    "content": "Xin chào bác sĩ, tôi cần tư vấn về...",
+    "sentAt": "2025-10-28T14:30:00Z"
+  }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /chat/conversations</h3>
+                    <p>Danh sách cuộc trò chuyện của user</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>status: string (ACTIVE, ARCHIVED)
+page: number
+limit: number</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 15,
+  "conversations": [
+    {
+      "id": "conv-uuid",
+      "doctorId": "doctor-uuid",
+      "doctorName": "BS. Nguyen Van A",
+      "doctorAvatar": "https://cdn.example.com/avatar.jpg",
+      "lastMessage": {
+        "content": "Bạn nên uống thuốc sau bữa ăn",
+        "sentAt": "2025-10-28T15:45:00Z",
+        "isRead": false
+      },
+      "unreadCount": 3,
+      "status": "ACTIVE"
+    }
+  ]
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /chat/conversations/{id}/messages</h3>
+                    <p>Lấy tin nhắn trong cuộc trò chuyện</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>before: timestamp (pagination)
+limit: number (default: 50)</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "conversationId": "conv-uuid",
+  "messages": [
+    {
+      "id": "msg-uuid",
+      "senderId": "user-uuid",
+      "senderType": "PATIENT",
+      "content": "Tôi bị đau đầu từ sáng",
+      "contentType": "TEXT",
+      "sentAt": "2025-10-28T14:30:00Z",
+      "isRead": true
+    },
+    {
+      "id": "msg-uuid-2",
+      "senderId": "doctor-uuid",
+      "senderType": "DOCTOR",
+      "content": "Bạn có bị sốt không?",
+      "contentType": "TEXT",
+      "sentAt": "2025-10-28T14:32:00Z",
+      "isRead": true
+    },
+    {
+      "id": "msg-uuid-3",
+      "senderId": "user-uuid",
+      "senderType": "PATIENT",
+      "content": "https://cdn.example.com/medical-report.pdf",
+      "contentType": "FILE",
+      "fileName": "medical-report.pdf",
+      "fileSize": 245678,
+      "sentAt": "2025-10-28T14:35:00Z",
+      "isRead": false
+    }
+  ],
+  "hasMore": true
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /chat/messages/send</h3>
+                    <p>Gửi tin nhắn văn bản (WebSocket hoặc REST API)</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "conversationId": "conv-uuid",
+  "content": "Cảm ơn bác sĩ đã tư vấn",
+  "contentType": "TEXT"
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "messageId": "msg-uuid",
+  "conversationId": "conv-uuid",
+  "content": "Cảm ơn bác sĩ đã tư vấn",
+  "sentAt": "2025-10-28T16:00:00Z",
+  "status": "SENT"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /chat/messages/upload</h3>
+                    <p>Upload file/hình ảnh trong chat</p>
+                    
+                    <h4>Request (multipart/form-data):</h4>
+                    <pre><code>conversationId: conv-uuid
+file: [binary file data]
+fileType: IMAGE | PDF | DOCUMENT</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "messageId": "msg-uuid",
+  "fileUrl": "https://cdn.example.com/chat-files/abc123.jpg",
+  "fileName": "xray-result.jpg",
+  "fileSize": 1024567,
+  "contentType": "IMAGE"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>PUT /chat/messages/{id}/read</h3>
+                    <p>Đánh dấu tin nhắn đã đọc</p>
+                    
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "messageId": "msg-uuid",
+  "isRead": true,
+  "readAt": "2025-10-28T16:05:00Z"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /video-call/create-room</h3>
+                    <p>Tạo phòng video call (bác sĩ hoặc bệnh nhân có thể tạo)</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "appointmentId": "appointment-uuid",
+  "conversationId": "conv-uuid", // Optional
+  "scheduledTime": "2025-10-28T17:00:00Z", // Optional
+  "duration": 30 // minutes
+}</code></pre>
+
+                    <h4>Response (201 Created):</h4>
+                    <pre><code>{
+  "roomId": "room-uuid",
+  "roomName": "consultation-12345",
+  "joinUrl": "https://meet.healthai.com/room-uuid",
+  "hostToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "guestToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "scheduledTime": "2025-10-28T17:00:00Z",
+  "expiresAt": "2025-10-28T17:30:00Z",
+  "status": "WAITING"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /video-call/rooms/{id}/token</h3>
+                    <p>Lấy access token cho video call (mỗi user có token riêng)</p>
+                    
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "roomId": "room-uuid",
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "joinUrl": "https://meet.healthai.com/room-uuid?token=...",
+  "expiresAt": "2025-10-28T17:30:00Z",
+  "configuration": {
+    "stunServers": ["stun:stun.l.google.com:19302"],
+    "turnServers": [{
+      "urls": "turn:turn.healthai.com:3478",
+      "username": "user123",
+      "credential": "pass456"
+    }]
+  }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>POST /video-call/rooms/{id}/join</h3>
+                    <p>Tham gia phòng video call (cập nhật trạng thái)</p>
+                    
+                    <h4>Request:</h4>
+                    <pre><code>{
+  "deviceInfo": {
+    "browser": "Chrome 118.0",
+    "os": "Windows 10",
+    "hasCamera": true,
+    "hasMicrophone": true
+  }
+}</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "roomId": "room-uuid",
+  "participants": [
+    {
+      "userId": "user-uuid",
+      "name": "Nguyen Van A",
+      "role": "PATIENT",
+      "joinedAt": "2025-10-28T17:00:00Z",
+      "isSpeaking": false,
+      "isVideoOn": true,
+      "isAudioOn": true
+    },
+    {
+      "userId": "doctor-uuid",
+      "name": "BS. Le Thi B",
+      "role": "DOCTOR",
+      "joinedAt": "2025-10-28T17:01:00Z",
+      "isSpeaking": true,
+      "isVideoOn": true,
+      "isAudioOn": true
+    }
+  ],
+  "status": "IN_PROGRESS",
+  "startedAt": "2025-10-28T17:00:00Z"
+}</code></pre>
+
+                    <hr>
+
+                    <h3>PUT /video-call/rooms/{id}/end</h3>
+                    <p>Kết thúc video call (chỉ host/doctor có quyền)</p>
+                    
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "roomId": "room-uuid",
+  "status": "ENDED",
+  "duration": 1850, // seconds
+  "startedAt": "2025-10-28T17:00:00Z",
+  "endedAt": "2025-10-28T17:30:50Z",
+  "recording": {
+    "available": true,
+    "url": "https://cdn.example.com/recordings/room-uuid.mp4",
+    "expiresAt": "2025-11-28T00:00:00Z"
+  }
+}</code></pre>
+
+                    <hr>
+
+                    <h3>GET /video-call/history</h3>
+                    <p>Lịch sử các cuộc gọi video</p>
+                    
+                    <h4>Query Parameters:</h4>
+                    <pre><code>page: number
+limit: number
+startDate: ISO timestamp
+endDate: ISO timestamp</code></pre>
+
+                    <h4>Response (200 OK):</h4>
+                    <pre><code>{
+  "total": 25,
+  "calls": [
+    {
+      "id": "room-uuid",
+      "appointmentId": "appointment-uuid",
+      "doctorName": "BS. Le Thi B",
+      "patientName": "Nguyen Van A",
+      "duration": 1850,
+      "startedAt": "2025-10-28T17:00:00Z",
+      "endedAt": "2025-10-28T17:30:50Z",
+      "hasRecording": true,
+      "notes": "Tư vấn về kế hoạch điều trị"
+    }
+  ]
+}</code></pre>
+
+                    <div class="warning-box">
+                        <strong>⚠️ WebSocket Events:</strong>
+                        <pre><code>// Client subscribe to:
+ws://api.healthai.com/ws/chat
+
+Events:
+- message.received: Nhận tin nhắn mới
+- message.read: Tin nhắn đã được đọc
+- typing.start: Đối phương đang gõ
+- typing.stop: Đối phương dừng gõ
+- call.incoming: Cuộc gọi video đến
+- call.started: Cuộc gọi bắt đầu
+- call.ended: Cuộc gọi kết thúc
+- participant.joined: Người tham gia vào room
+- participant.left: Người rời khỏi room</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Authentication -->
+            <section class="content-section">
+                <div class="card">
+                    <h2>🔑 Authentication</h2>
+                    
+                    <h3>JWT Token</h3>
+                    <p>Tất cả API (trừ public endpoints) yêu cầu JWT token trong header:</p>
+                    <pre><code>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</code></pre>
+
+                    <h3>Token Expiry</h3>
+                    <ul>
+                        <li><strong>Access Token:</strong> 1 giờ</li>
+                        <li><strong>Refresh Token:</strong> 7 ngày</li>
+                    </ul>
+
+                    <h3>Refresh Token</h3>
+                    <pre><code>POST /auth/refresh
+{
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Rate Limiting -->
+            <section class="content-section">
+                <div class="card">
+                    <h2>⏱️ Rate Limiting</h2>
+                    
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Endpoint</th>
+                                    <th>Limit</th>
+                                    <th>Window</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Public APIs</td>
+                                    <td>100 requests</td>
+                                    <td>1 minute</td>
+                                </tr>
+                                <tr>
+                                    <td>Authenticated APIs</td>
+                                    <td>1000 requests</td>
+                                    <td>1 minute</td>
+                                </tr>
+                                <tr>
+                                    <td>AI Diagnosis</td>
+                                    <td>5 requests</td>
+                                    <td>1 day</td>
+                                </tr>
+                                <tr>
+                                    <td>OTP Requests</td>
+                                    <td>3 attempts</td>
+                                    <td>5 minutes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Rate Limit Headers</h3>
+                    <pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1698484800</code></pre>
+                </div>
+            </section>
+
+            <!-- Inventory Management Service APIs -->
+            <section id="inventory" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Inventory Management Service</h2>
+                        <span class="card-badge">Port: 8009</span>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-warehouse"></i>
+                        <strong>Service:</strong> Quản lý kho hàng, xuất nhập tồn (Inventory & Warehouse Management)
+                    </div>
+
+                    <!-- Warehouse APIs -->
+                    <h3>📦 Warehouse Management</h3>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/warehouses</div>
+                    </div>
+                    <p><strong>Description:</strong> Lấy danh sách kho hàng</p>
+                    <h4>Query Parameters:</h4>
+                    <pre><code>{
+  "city": "Hà Nội",           // Filter theo thành phố
+  "type": "CENTRAL",          // CENTRAL, REGIONAL, RETAIL
+  "is_active": true,          // Kho đang hoạt động
+  "page": 1,
+  "limit": 20
+}</code></pre>
+                    <h4>Response 200:</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "warehouses": [
+      {
+        "id": "wh-uuid-123",
+        "code": "WH-HN-01",
+        "name": "Kho Trung Tâm Hà Nội",
+        "type": "CENTRAL",
+        "address": "123 Đường ABC, Cầu Giấy",
+        "city": "Hà Nội",
+        "manager_name": "Nguyễn Văn A",
+        "manager_phone": "0987654321",
+        "capacity": 50000,
+        "current_stock_count": 35420,
+        "utilization_rate": 70.84,
+        "is_active": true,
+        "created_at": "2025-01-15T10:00:00Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 20,
+      "total": 15
+    }
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/warehouses</div>
+                    </div>
+                    <p><strong>Description:</strong> Tạo kho mới (ADMIN only)</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "code": "WH-DN-03",
+  "name": "Kho Đà Nẵng",
+  "type": "REGIONAL",
+  "address": "456 Đường XYZ, Hải Châu",
+  "city": "Đà Nẵng",
+  "manager_name": "Trần Thị B",
+  "manager_phone": "0912345678",
+  "capacity": 30000
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/warehouses/{warehouseId}</div>
+                    </div>
+                    <p><strong>Description:</strong> Chi tiết kho hàng</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-put">PUT</div>
+                        <div class="api-path">/api/v1/warehouses/{warehouseId}</div>
+                    </div>
+                    <p><strong>Description:</strong> Cập nhật thông tin kho</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-delete">DELETE</div>
+                        <div class="api-path">/api/v1/warehouses/{warehouseId}</div>
+                    </div>
+                    <p><strong>Description:</strong> Vô hiệu hóa kho (soft delete)</p>
+
+                    <!-- Inventory Items APIs -->
+                    <h3>📊 Inventory Items</h3>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/items</div>
+                    </div>
+                    <p><strong>Description:</strong> Lấy danh sách tồn kho</p>
+                    <h4>Query Parameters:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "product_id": "prod-uuid-456",
+  "low_stock": true,          // Lọc tồn kho thấp
+  "out_of_stock": true,       // Lọc hết hàng
+  "page": 1,
+  "limit": 50
+}</code></pre>
+                    <h4>Response 200:</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "inv-uuid-789",
+        "product": {
+          "id": "prod-uuid-456",
+          "name": "Paracetamol 500mg",
+          "sku": "MED-001"
+        },
+        "warehouse": {
+          "id": "wh-uuid-123",
+          "code": "WH-HN-01",
+          "name": "Kho Trung Tâm Hà Nội"
+        },
+        "quantity": 150,
+        "reserved_quantity": 25,
+        "available_quantity": 125,
+        "min_stock_level": 50,
+        "max_stock_level": 1000,
+        "reorder_point": 100,
+        "stock_status": "AVAILABLE",   // AVAILABLE, LOW_STOCK, OUT_OF_STOCK
+        "last_restock_date": "2025-10-20T14:30:00Z",
+        "updated_at": "2025-10-28T10:00:00Z"
+      }
+    ],
+    "summary": {
+      "total_items": 523,
+      "low_stock_items": 45,
+      "out_of_stock_items": 12,
+      "reorder_needed": 38
+    }
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/items/{itemId}</div>
+                    </div>
+                    <p><strong>Description:</strong> Chi tiết mục tồn kho</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/products/{productId}/stock</div>
+                    </div>
+                    <p><strong>Description:</strong> Tồn kho của sản phẩm ở tất cả kho</p>
+                    <h4>Response 200:</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "product_id": "prod-uuid-456",
+    "product_name": "Paracetamol 500mg",
+    "total_quantity": 485,
+    "total_available": 420,
+    "total_reserved": 65,
+    "warehouses": [
+      {
+        "warehouse_id": "wh-uuid-123",
+        "warehouse_code": "WH-HN-01",
+        "warehouse_name": "Kho Hà Nội",
+        "quantity": 150,
+        "available": 125,
+        "reserved": 25
+      },
+      {
+        "warehouse_id": "wh-uuid-456",
+        "warehouse_code": "WH-HCM-02",
+        "warehouse_name": "Kho TP.HCM",
+        "quantity": 335,
+        "available": 295,
+        "reserved": 40
+      }
+    ]
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/items/{itemId}/reserve</div>
+                    </div>
+                    <p><strong>Description:</strong> Đặt trước tồn kho (khi thêm vào giỏ hàng)</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "quantity": 5,
+  "reference_id": "cart-uuid-123",    // cart_id hoặc order_id
+  "reference_type": "CART",
+  "duration_minutes": 15              // Giữ slot 15 phút
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/items/{itemId}/release</div>
+                    </div>
+                    <p><strong>Description:</strong> Giải phóng tồn kho đã đặt trước (khi xóa khỏi giỏ)</p>
+
+                    <!-- Inventory Transactions APIs -->
+                    <h3>📝 Inventory Transactions</h3>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/transactions</div>
+                    </div>
+                    <p><strong>Description:</strong> Lịch sử xuất nhập kho</p>
+                    <h4>Query Parameters:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "transaction_type": "IN",     // IN, OUT, TRANSFER, ADJUSTMENT, RETURN
+  "status": "COMPLETED",        // PENDING, APPROVED, COMPLETED, CANCELLED
+  "from_date": "2025-10-01",
+  "to_date": "2025-10-31",
+  "page": 1,
+  "limit": 50
+}</code></pre>
+                    <h4>Response 200:</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "transactions": [
+      {
+        "id": "txn-uuid-123",
+        "transaction_code": "IN-2025-10-001",
+        "transaction_type": "IN",
+        "warehouse": {
+          "id": "wh-uuid-123",
+          "code": "WH-HN-01",
+          "name": "Kho Hà Nội"
+        },
+        "product": {
+          "id": "prod-uuid-456",
+          "name": "Paracetamol 500mg"
+        },
+        "quantity": 100,
+        "quantity_before": 50,
+        "quantity_after": 150,
+        "reason": "PURCHASE_ORDER",
+        "reference_id": "po-uuid-789",
+        "unit_cost": 5000,
+        "total_cost": 500000,
+        "created_by": {
+          "id": "user-uuid-111",
+          "name": "Nguyễn Văn A"
+        },
+        "approved_by": {
+          "id": "user-uuid-222",
+          "name": "Quản lý kho"
+        },
+        "status": "COMPLETED",
+        "created_at": "2025-10-28T10:00:00Z",
+        "completed_at": "2025-10-28T10:30:00Z"
+      }
+    ],
+    "summary": {
+      "total_in": 1500,
+      "total_out": 350,
+      "net_change": 1150
+    }
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/transactions/in</div>
+                    </div>
+                    <p><strong>Description:</strong> Tạo phiếu nhập kho</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "product_id": "prod-uuid-456",
+  "quantity": 100,
+  "reason": "PURCHASE_ORDER",
+  "reference_id": "po-uuid-789",
+  "unit_cost": 5000,
+  "notes": "Nhập hàng từ NCC ABC"
+}</code></pre>
+                    <h4>Response 201:</h4>
+                    <pre><code>{
+  "success": true,
+  "message": "Phiếu nhập kho đã được tạo",
+  "data": {
+    "transaction_id": "txn-uuid-123",
+    "transaction_code": "IN-2025-10-001",
+    "status": "PENDING",
+    "inventory_item": {
+      "quantity_before": 50,
+      "quantity_after": 150
+    }
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/transactions/out</div>
+                    </div>
+                    <p><strong>Description:</strong> Tạo phiếu xuất kho</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "product_id": "prod-uuid-456",
+  "quantity": 10,
+  "reason": "CUSTOMER_ORDER",
+  "reference_id": "order-uuid-999",
+  "reference_type": "ORDER",
+  "notes": "Xuất hàng cho đơn #999"
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/transactions/transfer</div>
+                    </div>
+                    <p><strong>Description:</strong> Chuyển kho (Kho A → Kho B)</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "from_warehouse_id": "wh-uuid-123",
+  "to_warehouse_id": "wh-uuid-456",
+  "product_id": "prod-uuid-789",
+  "quantity": 50,
+  "reason": "TRANSFER",
+  "notes": "Chuyển hàng từ HN sang HCM do thiếu hàng"
+}</code></pre>
+                    <h4>Response 201:</h4>
+                    <pre><code>{
+  "success": true,
+  "message": "Phiếu chuyển kho đã được tạo",
+  "data": {
+    "transfer_id": "transfer-uuid-999",
+    "out_transaction": {
+      "id": "txn-uuid-111",
+      "code": "TRANSFER-OUT-2025-10-001",
+      "warehouse": "WH-HN-01",
+      "quantity": -50
+    },
+    "in_transaction": {
+      "id": "txn-uuid-222",
+      "code": "TRANSFER-IN-2025-10-001",
+      "warehouse": "WH-HCM-02",
+      "quantity": 50
+    },
+    "status": "PENDING"
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-post">POST</div>
+                        <div class="api-path">/api/v1/inventory/transactions/adjustment</div>
+                    </div>
+                    <p><strong>Description:</strong> Điều chỉnh tồn kho (kiểm kê, sửa lỗi)</p>
+                    <h4>Request Body:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "product_id": "prod-uuid-456",
+  "adjustment_quantity": -5,        // Âm = giảm, Dương = tăng
+  "reason": "ADJUSTMENT",
+  "notes": "Kiểm kê phát hiện hàng hư hỏng"
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-put">PUT</div>
+                        <div class="api-path">/api/v1/inventory/transactions/{transactionId}/approve</div>
+                    </div>
+                    <p><strong>Description:</strong> Phê duyệt phiếu xuất/nhập kho</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-put">PUT</div>
+                        <div class="api-path">/api/v1/inventory/transactions/{transactionId}/complete</div>
+                    </div>
+                    <p><strong>Description:</strong> Hoàn thành phiếu (cập nhật tồn kho thực tế)</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-put">PUT</div>
+                        <div class="api-path">/api/v1/inventory/transactions/{transactionId}/cancel</div>
+                    </div>
+                    <p><strong>Description:</strong> Hủy phiếu xuất/nhập</p>
+
+                    <!-- Reports APIs -->
+                    <h3>📈 Reports & Analytics</h3>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/reports/stock-summary</div>
+                    </div>
+                    <p><strong>Description:</strong> Báo cáo tồn kho tổng hợp</p>
+                    <h4>Query Parameters:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "category": "THUOC",
+  "date": "2025-10-28"
+}</code></pre>
+                    <h4>Response 200:</h4>
+                    <pre><code>{
+  "success": true,
+  "data": {
+    "summary": {
+      "total_products": 523,
+      "total_quantity": 45280,
+      "total_value": 2850000000,
+      "low_stock_count": 45,
+      "out_of_stock_count": 12,
+      "reorder_needed_count": 38
+    },
+    "by_category": [
+      {
+        "category": "THUOC",
+        "product_count": 350,
+        "total_quantity": 35000,
+        "total_value": 2200000000
+      }
+    ]
+  }
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/reports/low-stock</div>
+                    </div>
+                    <p><strong>Description:</strong> Báo cáo sản phẩm sắp hết hàng</p>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/reports/transaction-history</div>
+                    </div>
+                    <p><strong>Description:</strong> Báo cáo lịch sử xuất nhập</p>
+                    <h4>Query Parameters:</h4>
+                    <pre><code>{
+  "warehouse_id": "wh-uuid-123",
+  "from_date": "2025-10-01",
+  "to_date": "2025-10-31",
+  "group_by": "day"           // day, week, month
+}</code></pre>
+
+                    <div class="api-endpoint">
+                        <div class="api-method method-get">GET</div>
+                        <div class="api-path">/api/v1/inventory/reports/valuation</div>
+                    </div>
+                    <p><strong>Description:</strong> Báo cáo giá trị tồn kho</p>
+
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Business Rules:</strong>
+                        <ul>
+                            <li><strong>Reserve Stock:</strong> Khi thêm vào giỏ → tự động reserve tồn kho 15 phút</li>
+                            <li><strong>Auto-Release:</strong> Sau 15 phút nếu không checkout → tự động release</li>
+                            <li><strong>Low Stock Alert:</strong> Khi quantity ≤ min_stock_level → gửi email cảnh báo</li>
+                            <li><strong>Auto Reorder:</strong> Khi quantity ≤ reorder_point → tạo đơn đặt hàng tự động</li>
+                            <li><strong>Transfer Flow:</strong> Tạo 2 transactions (OUT từ kho nguồn + IN vào kho đích)</li>
+                            <li><strong>Approval Required:</strong> Phiếu > 10 triệu VND hoặc quantity > 100 cần phê duyệt</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HealthAI App API Documentation</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

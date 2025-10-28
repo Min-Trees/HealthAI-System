@@ -1,0 +1,2134 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Schema - HealthAI App</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="../index.html" class="nav-link">Trang chủ</a>
+                    <a href="architecture.html" class="nav-link">Kiến trúc</a>
+                    <a href="functional-flows.html" class="nav-link">Chức năng</a>
+                    <a href="api-docs.html" class="nav-link">API</a>
+                    <a href="database.html" class="nav-link active">Database</a>
+                    <a href="quick-start.html" class="nav-link">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Tables</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#er-diagram" class="sidebar-link">ER Diagram</a></li>
+                    <li class="sidebar-item"><a href="#users" class="sidebar-link">users</a></li>
+                    <li class="sidebar-item"><a href="#profiles" class="sidebar-link">user_profiles</a></li>
+                    <li class="sidebar-item"><a href="#doctors" class="sidebar-link">doctors</a></li>
+                    <li class="sidebar-item"><a href="#appointments" class="sidebar-link">appointments</a></li>
+                    <li class="sidebar-item"><a href="#products" class="sidebar-link">products</a></li>
+                    <li class="sidebar-item"><a href="#orders" class="sidebar-link">orders</a></li>
+                    <li class="sidebar-item"><a href="#conversations" class="sidebar-link">conversations</a></li>
+                    <li class="sidebar-item"><a href="#chat-messages" class="sidebar-link">chat_messages</a></li>
+                    <li class="sidebar-item"><a href="#video-calls" class="sidebar-link">video_call_rooms</a></li>
+                    <li class="sidebar-item"><a href="#warehouses" class="sidebar-link">warehouses</a></li>
+                    <li class="sidebar-item"><a href="#inventory-items" class="sidebar-link">inventory_items</a></li>
+                    <li class="sidebar-item"><a href="#inventory-transactions" class="sidebar-link">inventory_transactions</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="content-section fade-in">
+                <h1 class="page-title">💾 Database Schema</h1>
+                <p class="page-subtitle">PostgreSQL Database Design - 25 Core Tables</p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-database"></i>
+                    <strong>Database:</strong> PostgreSQL 14+ | <strong>Charset:</strong> UTF-8
+                </div>
+            </section>
+
+            <!-- ER Diagram -->
+            <section id="er-diagram" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Entity Relationship Diagram</h2>
+                        <span class="card-badge">Mermaid</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+erDiagram
+    USERS ||--o{ USER_PROFILES : has
+    USERS ||--o{ MEDICAL_HISTORY : has
+    USERS ||--o{ APPOINTMENTS : books
+    USERS ||--o{ VITAL_SIGNS : tracks
+    USERS ||--o{ ORDERS : places
+    USERS ||--o{ CONVERSATIONS : initiates
+    USERS ||--o{ CART_ITEMS : has
+    USERS ||--o{ PRODUCT_REVIEWS : writes
+    
+    DOCTORS ||--o{ APPOINTMENTS : provides
+    DOCTORS ||--o{ PRESCRIPTIONS : writes
+    DOCTORS ||--o{ CONVERSATIONS : participates
+    
+    PRODUCTS ||--o{ ORDER_ITEMS : "included in"
+    PRODUCTS ||--o{ CART_ITEMS : "added to"
+    PRODUCTS ||--o{ PRODUCT_REVIEWS : "reviewed as"
+    PRODUCTS ||--o{ INVENTORY_ITEMS : "stocked as"
+    
+    APPOINTMENTS ||--o{ AI_DIAGNOSES : generates
+    APPOINTMENTS ||--o{ PRESCRIPTIONS : results_in
+    APPOINTMENTS ||--o{ VIDEO_CALL_ROOMS : "may have"
+    
+    ORDERS ||--o{ ORDER_ITEMS : contains
+    ORDERS ||--o{ PAYMENT_TRANSACTIONS : has
+    ORDERS ||--o| SHIPMENTS : "shipped via"
+    
+    CONVERSATIONS ||--o{ CHAT_MESSAGES : contains
+    CONVERSATIONS ||--o| VIDEO_CALL_ROOMS : "may lead to"
+    
+    WAREHOUSES ||--o{ INVENTORY_ITEMS : stores
+    WAREHOUSES ||--o{ INVENTORY_TRANSACTIONS : "receives/ships from"
+    
+    INVENTORY_ITEMS ||--o{ INVENTORY_TRANSACTIONS : tracked_by
+    
+    USERS {
+        uuid id PK
+        varchar email UK
+        varchar phone UK
+        varchar password_hash
+        boolean is_verified
+        timestamp created_at
+    }
+    
+    USER_PROFILES {
+        uuid id PK
+        uuid user_id FK
+        varchar full_name
+        date dob
+        text address
+        varchar avatar_url
+    }
+    
+    DOCTORS {
+        uuid id PK
+        varchar name
+        varchar specialty
+        varchar license_number
+        boolean available
+    }
+    
+    APPOINTMENTS {
+        uuid id PK
+        uuid patient_id FK
+        uuid doctor_id FK
+        timestamp appointment_date
+        varchar status
+    }
+    
+    PRODUCTS {
+        uuid id PK
+        varchar name
+        decimal price
+        integer stock
+        varchar category
+    }
+    
+    ORDERS {
+        uuid id PK
+        uuid user_id FK
+        decimal total_amount
+        varchar status
+        timestamp created_at
+    }
+    
+    WAREHOUSES {
+        uuid id PK
+        varchar name
+        varchar address
+        varchar type
+        boolean is_active
+    }
+    
+    INVENTORY_ITEMS {
+        uuid id PK
+        uuid product_id FK
+        uuid warehouse_id FK
+        integer quantity
+        integer reserved_quantity
+        integer min_stock_level
+    }
+    
+    INVENTORY_TRANSACTIONS {
+        uuid id PK
+        uuid inventory_item_id FK
+        uuid warehouse_id FK
+        varchar transaction_type
+        integer quantity
+        varchar reason
+        uuid reference_id
+        timestamp created_at
+    }
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Table -->
+            <section id="users" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: users</h2>
+                        <span class="card-badge">Authentication</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>User unique identifier</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>email</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>User email address</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>phone</strong></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Phone number</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>password_hash</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Bcrypt hashed password</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>otp_token</strong></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Current OTP verification token</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>is_verified</strong></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT FALSE</td>
+                                    <td>Email/Phone verification status</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>is_active</strong></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT TRUE</td>
+                                    <td>Account active status</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>role</strong></td>
+                                    <td>ENUM</td>
+                                    <td>DEFAULT 'PATIENT'</td>
+                                    <td>ADMIN, DOCTOR, PHARMACIST, PATIENT</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>created_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Registration timestamp</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>updated_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Last update timestamp</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code>CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_phone ON users(phone);
+CREATE INDEX idx_users_created_at ON users(created_at);</code></pre>
+
+                    <h3>Example SQL:</h3>
+                    <pre><code>CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    otp_token VARCHAR(100),
+    is_verified BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
+    role VARCHAR(20) DEFAULT 'PATIENT',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+                </div>
+            </section>
+
+            <!-- User Profiles Table -->
+            <section id="profiles" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: user_profiles</h2>
+                        <span class="card-badge">Profile Data</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Profile ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>user_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>Reference to user</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>full_name</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Full name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>dob</strong></td>
+                                    <td>DATE</td>
+                                    <td>NOT NULL</td>
+                                    <td>Date of birth</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>gender</strong></td>
+                                    <td>VARCHAR(10)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Male, Female, Other</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>address</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Full address</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>avatar_url</strong></td>
+                                    <td>VARCHAR(500)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Profile picture URL</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>emergency_contact</strong></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Emergency phone number</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Medical History Table -->
+            <section class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: medical_history</h2>
+                        <span class="card-badge">Medical Records</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Record ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>user_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>Patient reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>disease_name</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Disease or condition name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>date_diagnosed</strong></td>
+                                    <td>DATE</td>
+                                    <td>NOT NULL</td>
+                                    <td>Diagnosis date</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>status</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Active, Controlled, Recovered</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>notes</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Additional medical notes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>created_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Record creation time</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vital Signs Table -->
+            <section class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: vital_signs</h2>
+                        <span class="card-badge">Health Tracking</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Measurement ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>user_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>User reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>heart_rate</strong></td>
+                                    <td>INTEGER</td>
+                                    <td>CHECK (40-200)</td>
+                                    <td>Heart rate in bpm</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>blood_pressure</strong></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Format: "120/80"</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>temperature</strong></td>
+                                    <td>DECIMAL(4,2)</td>
+                                    <td>CHECK (35-42)</td>
+                                    <td>Body temperature in °C</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>respiratory_rate</strong></td>
+                                    <td>INTEGER</td>
+                                    <td>CHECK (12-40)</td>
+                                    <td>Breaths per minute</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>weight</strong></td>
+                                    <td>DECIMAL(5,2)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Weight in kg</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>measured_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Measurement timestamp</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Doctors Table -->
+            <section id="doctors" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: doctors</h2>
+                        <span class="card-badge">Healthcare Providers</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Doctor ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>name</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Doctor full name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>specialty</strong></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Medical specialty</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>license_number</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Medical license number</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>hospital_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → hospitals(id)</td>
+                                    <td>Hospital reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>experience_years</strong></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL</td>
+                                    <td>Years of experience</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>consultation_fee</strong></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Fee in VND</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>rating</strong></td>
+                                    <td>DECIMAL(3,2)</td>
+                                    <td>DEFAULT 0</td>
+                                    <td>Average rating (0-5)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>available</strong></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT TRUE</td>
+                                    <td>Availability status</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Appointments Table -->
+            <section id="appointments" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: appointments</h2>
+                        <span class="card-badge">Scheduling</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Appointment ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>patient_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>Patient reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>doctor_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → doctors(id)</td>
+                                    <td>Doctor reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>appointment_date</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NOT NULL</td>
+                                    <td>Scheduled date & time</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>status</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>DEFAULT 'PENDING'</td>
+                                    <td>PENDING, CONFIRMED, COMPLETED, CANCELLED</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>type</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                    <td>VIDEO_CALL, IN_PERSON</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>reason</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Appointment reason</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>notes</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Doctor's notes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>video_call_link</strong></td>
+                                    <td>VARCHAR(500)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Meeting link</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Table -->
+            <section id="products" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: products</h2>
+                        <span class="card-badge">Pharmacy</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Product ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>name</strong></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Product name</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>description</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Product description</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>price</strong></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Price in VND</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>stock</strong></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL, DEFAULT 0</td>
+                                    <td>Available quantity</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>category</strong></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                    <td>OTC, PRESCRIPTION, SUPPLEMENT</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>barcode</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>UNIQUE</td>
+                                    <td>Product barcode</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>image_url</strong></td>
+                                    <td>VARCHAR(500)</td>
+                                    <td>NULLABLE</td>
+                                    <td>Product image URL</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>requires_prescription</strong></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT FALSE</td>
+                                    <td>Prescription requirement</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Table -->
+            <section id="orders" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: orders</h2>
+                        <span class="card-badge">E-commerce</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Order ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>user_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>Customer reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>total_amount</strong></td>
+                                    <td>DECIMAL(15,2)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Total order amount</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>status</strong></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>DEFAULT 'PENDING'</td>
+                                    <td>PENDING, PAID, SHIPPED, DELIVERED, CANCELLED</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>delivery_address</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NOT NULL</td>
+                                    <td>Shipping address</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>delivery_note</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Delivery instructions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>estimated_delivery</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULLABLE</td>
+                                    <td>Expected delivery date</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>created_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Order creation time</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Prescriptions Table -->
+            <section class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: prescriptions</h2>
+                        <span class="card-badge">Medical</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>id</strong></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Prescription ID</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>user_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → users(id)</td>
+                                    <td>Patient reference</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>doctor_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → doctors(id)</td>
+                                    <td>Prescribing doctor</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>product_id</strong></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY → products(id)</td>
+                                    <td>Prescribed medication</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>dosage</strong></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Dosage instructions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>duration_days</strong></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL</td>
+                                    <td>Treatment duration</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>instructions</strong></td>
+                                    <td>TEXT</td>
+                                    <td>NULLABLE</td>
+                                    <td>Additional instructions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>issued_at</strong></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT NOW()</td>
+                                    <td>Issue timestamp</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Database Statistics -->
+            <section class="content-section">
+                <div class="card">
+                    <h2>📊 Database Statistics</h2>
+                    
+                    <div class="grid grid-3">
+                        <div class="card text-center">
+                            <h1 style="color: var(--primary-color);">18</h1>
+                            <p><strong>Core Tables</strong></p>
+                        </div>
+                        <div class="card text-center">
+                            <h1 style="color: var(--accent-color);">40+</h1>
+                            <p><strong>Indexes</strong></p>
+                        </div>
+                        <div class="card text-center">
+                            <h1 style="color: var(--warning-color);">25+</h1>
+                            <p><strong>Foreign Keys</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Conversations Table -->
+            <section id="conversations" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: conversations</h2>
+                        <span class="card-badge">Chat System</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh cuộc trò chuyện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Bệnh nhân trong cuộc trò chuyện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>doctor_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (doctors), NOT NULL</td>
+                                    <td>Bác sĩ trong cuộc trò chuyện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>appointment_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (appointments), NULL</td>
+                                    <td>Liên kết với lịch hẹn (nếu có)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (status IN ('ACTIVE', 'ARCHIVED', 'CLOSED')), DEFAULT 'ACTIVE'</td>
+                                    <td>Trạng thái cuộc trò chuyện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>last_message_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian tin nhắn cuối cùng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo</td>
+                                </tr>
+                                <tr>
+                                    <td><code>updated_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian cập nhật</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_conversations_user_id ON conversations(user_id);
+CREATE INDEX idx_conversations_doctor_id ON conversations(doctor_id);
+CREATE INDEX idx_conversations_status ON conversations(status);
+CREATE INDEX idx_conversations_last_message ON conversations(last_message_at DESC);</code></pre>
+                </div>
+            </section>
+
+            <!-- Chat Messages Table -->
+            <section id="messages" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: chat_messages</h2>
+                        <span class="card-badge">Chat System</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh tin nhắn</td>
+                                </tr>
+                                <tr>
+                                    <td><code>conversation_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (conversations), NOT NULL</td>
+                                    <td>Thuộc cuộc trò chuyện nào</td>
+                                </tr>
+                                <tr>
+                                    <td><code>sender_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người gửi tin nhắn</td>
+                                </tr>
+                                <tr>
+                                    <td><code>sender_type</code></td>
+                                    <td>VARCHAR(10)</td>
+                                    <td>CHECK (sender_type IN ('PATIENT', 'DOCTOR')), NOT NULL</td>
+                                    <td>Loại người gửi</td>
+                                </tr>
+                                <tr>
+                                    <td><code>content</code></td>
+                                    <td>TEXT</td>
+                                    <td>NOT NULL</td>
+                                    <td>Nội dung tin nhắn hoặc URL file</td>
+                                </tr>
+                                <tr>
+                                    <td><code>content_type</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (content_type IN ('TEXT', 'IMAGE', 'FILE', 'AUDIO', 'VIDEO')), DEFAULT 'TEXT'</td>
+                                    <td>Loại nội dung</td>
+                                </tr>
+                                <tr>
+                                    <td><code>file_name</code></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NULL</td>
+                                    <td>Tên file (nếu là file)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>file_size</code></td>
+                                    <td>INTEGER</td>
+                                    <td>NULL</td>
+                                    <td>Kích thước file (bytes)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>is_read</code></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT FALSE</td>
+                                    <td>Đã đọc chưa</td>
+                                </tr>
+                                <tr>
+                                    <td><code>read_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian đọc tin nhắn</td>
+                                </tr>
+                                <tr>
+                                    <td><code>sent_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian gửi</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_messages_conversation_id ON chat_messages(conversation_id);
+CREATE INDEX idx_messages_sender_id ON chat_messages(sender_id);
+CREATE INDEX idx_messages_sent_at ON chat_messages(sent_at DESC);
+CREATE INDEX idx_messages_unread ON chat_messages(conversation_id, is_read) WHERE is_read = FALSE;</code></pre>
+                </div>
+            </section>
+
+            <!-- Video Call Rooms Table -->
+            <section id="video-rooms" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: video_call_rooms</h2>
+                        <span class="card-badge">Video Call System</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh phòng video call</td>
+                                </tr>
+                                <tr>
+                                    <td><code>room_name</code></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Tên phòng (dùng cho URL)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>appointment_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (appointments), NULL</td>
+                                    <td>Liên kết với lịch hẹn</td>
+                                </tr>
+                                <tr>
+                                    <td><code>conversation_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (conversations), NULL</td>
+                                    <td>Liên kết với cuộc trò chuyện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>host_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người tạo phòng (thường là bác sĩ)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>guest_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người tham gia (bệnh nhân)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (status IN ('WAITING', 'IN_PROGRESS', 'ENDED', 'CANCELLED')), DEFAULT 'WAITING'</td>
+                                    <td>Trạng thái phòng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>scheduled_time</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian hẹn gọi</td>
+                                </tr>
+                                <tr>
+                                    <td><code>started_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian bắt đầu gọi</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ended_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian kết thúc</td>
+                                </tr>
+                                <tr>
+                                    <td><code>duration</code></td>
+                                    <td>INTEGER</td>
+                                    <td>NULL</td>
+                                    <td>Thời lượng cuộc gọi (giây)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>recording_url</code></td>
+                                    <td>VARCHAR(500)</td>
+                                    <td>NULL</td>
+                                    <td>URL bản ghi cuộc gọi (nếu có)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>has_recording</code></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT FALSE</td>
+                                    <td>Có bản ghi không</td>
+                                </tr>
+                                <tr>
+                                    <td><code>notes</code></td>
+                                    <td>TEXT</td>
+                                    <td>NULL</td>
+                                    <td>Ghi chú sau cuộc gọi</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE UNIQUE INDEX idx_video_rooms_name ON video_call_rooms(room_name);
+CREATE INDEX idx_video_rooms_appointment_id ON video_call_rooms(appointment_id);
+CREATE INDEX idx_video_rooms_host_id ON video_call_rooms(host_id);
+CREATE INDEX idx_video_rooms_guest_id ON video_call_rooms(guest_id);
+CREATE INDEX idx_video_rooms_status ON video_call_rooms(status);
+CREATE INDEX idx_video_rooms_scheduled ON video_call_rooms(scheduled_time DESC);</code></pre>
+
+                    <h3>SQL Create Statement:</h3>
+                    <pre><code class="language-sql">CREATE TABLE video_call_rooms (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    room_name VARCHAR(100) UNIQUE NOT NULL,
+    appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
+    conversation_id UUID REFERENCES conversations(id) ON DELETE SET NULL,
+    host_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    guest_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'WAITING' CHECK (status IN ('WAITING', 'IN_PROGRESS', 'ENDED', 'CANCELLED')),
+    scheduled_time TIMESTAMP,
+    started_at TIMESTAMP,
+    ended_at TIMESTAMP,
+    duration INTEGER,
+    recording_url VARCHAR(500),
+    has_recording BOOLEAN DEFAULT FALSE,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+                </div>
+            </section>
+
+            <!-- Cart Items Table -->
+            <section id="cart-items" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: cart_items</h2>
+                        <span class="card-badge">E-Commerce</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh cart item</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người dùng sở hữu giỏ hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>product_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (products), NOT NULL</td>
+                                    <td>Sản phẩm trong giỏ</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>CHECK (quantity > 0), DEFAULT 1</td>
+                                    <td>Số lượng sản phẩm</td>
+                                </tr>
+                                <tr>
+                                    <td><code>price_at_add</code></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Giá tại thời điểm thêm vào giỏ</td>
+                                </tr>
+                                <tr>
+                                    <td><code>added_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian thêm vào giỏ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_cart_items_user_id ON cart_items(user_id);
+CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
+CREATE UNIQUE INDEX idx_cart_items_user_product ON cart_items(user_id, product_id);</code></pre>
+
+                    <h3>SQL Create Statement:</h3>
+                    <pre><code class="language-sql">CREATE TABLE cart_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+    price_at_add DECIMAL(10,2) NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, product_id)
+);</code></pre>
+                </div>
+            </section>
+
+            <!-- Order Items Table -->
+            <section id="order-items" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: order_items</h2>
+                        <span class="card-badge">E-Commerce</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh order item</td>
+                                </tr>
+                                <tr>
+                                    <td><code>order_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (orders), NOT NULL</td>
+                                    <td>Thuộc đơn hàng nào</td>
+                                </tr>
+                                <tr>
+                                    <td><code>product_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (products), NOT NULL</td>
+                                    <td>Sản phẩm trong đơn</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>CHECK (quantity > 0), NOT NULL</td>
+                                    <td>Số lượng đặt mua</td>
+                                </tr>
+                                <tr>
+                                    <td><code>price</code></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Giá tại thời điểm đặt hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>subtotal</code></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>GENERATED ALWAYS AS (quantity * price) STORED</td>
+                                    <td>Tổng tiền item (tính tự động)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX idx_order_items_product_id ON order_items(product_id);</code></pre>
+
+                    <h3>SQL Create Statement:</h3>
+                    <pre><code class="language-sql">CREATE TABLE order_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE RESTRICT,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    price DECIMAL(10,2) NOT NULL,
+    subtotal DECIMAL(10,2) GENERATED ALWAYS AS (quantity * price) STORED
+);</code></pre>
+                </div>
+            </section>
+
+            <!-- Payment Transactions Table -->
+            <section id="payment-transactions" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: payment_transactions</h2>
+                        <span class="card-badge">Payment</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã giao dịch nội bộ</td>
+                                </tr>
+                                <tr>
+                                    <td><code>order_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (orders), NOT NULL</td>
+                                    <td>Liên kết với đơn hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người thực hiện thanh toán</td>
+                                </tr>
+                                <tr>
+                                    <td><code>amount</code></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>CHECK (amount > 0), NOT NULL</td>
+                                    <td>Số tiền thanh toán</td>
+                                </tr>
+                                <tr>
+                                    <td><code>payment_method</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (payment_method IN ('VNPAY', 'MOMO', 'ZALOPAY', 'COD')), NOT NULL</td>
+                                    <td>Phương thức thanh toán</td>
+                                </tr>
+                                <tr>
+                                    <td><code>transaction_id</code></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>UNIQUE</td>
+                                    <td>Mã giao dịch từ payment gateway</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (status IN ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED')), DEFAULT 'PENDING'</td>
+                                    <td>Trạng thái giao dịch</td>
+                                </tr>
+                                <tr>
+                                    <td><code>gateway_response</code></td>
+                                    <td>JSONB</td>
+                                    <td>NULL</td>
+                                    <td>Response từ payment gateway (JSON)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo giao dịch</td>
+                                </tr>
+                                <tr>
+                                    <td><code>completed_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian hoàn thành</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_payment_transactions_order_id ON payment_transactions(order_id);
+CREATE INDEX idx_payment_transactions_user_id ON payment_transactions(user_id);
+CREATE INDEX idx_payment_transactions_status ON payment_transactions(status);
+CREATE UNIQUE INDEX idx_payment_transactions_transaction_id ON payment_transactions(transaction_id) WHERE transaction_id IS NOT NULL;</code></pre>
+                </div>
+            </section>
+
+            <!-- Shipments Table -->
+            <section id="shipments" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: shipments</h2>
+                        <span class="card-badge">Logistics</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh shipment</td>
+                                </tr>
+                                <tr>
+                                    <td><code>order_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (orders), UNIQUE, NOT NULL</td>
+                                    <td>Liên kết với đơn hàng (1-1)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tracking_number</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Mã tracking từ đơn vị vận chuyển</td>
+                                </tr>
+                                <tr>
+                                    <td><code>carrier</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (carrier IN ('GHTK', 'GHN', 'VIETTEL_POST', 'J&T')), NOT NULL</td>
+                                    <td>Đơn vị vận chuyển</td>
+                                </tr>
+                                <tr>
+                                    <td><code>shipping_address</code></td>
+                                    <td>TEXT</td>
+                                    <td>NOT NULL</td>
+                                    <td>Địa chỉ giao hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>recipient_name</code></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Tên người nhận</td>
+                                </tr>
+                                <tr>
+                                    <td><code>recipient_phone</code></td>
+                                    <td>VARCHAR(15)</td>
+                                    <td>NOT NULL</td>
+                                    <td>SĐT người nhận</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>CHECK (status IN ('PENDING', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED')), DEFAULT 'PENDING'</td>
+                                    <td>Trạng thái vận chuyển</td>
+                                </tr>
+                                <tr>
+                                    <td><code>estimated_delivery</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Dự kiến giao hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>actual_delivery</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian giao thực tế</td>
+                                </tr>
+                                <tr>
+                                    <td><code>shipping_fee</code></td>
+                                    <td>DECIMAL(10,2)</td>
+                                    <td>DEFAULT 0</td>
+                                    <td>Phí vận chuyển</td>
+                                </tr>
+                                <tr>
+                                    <td><code>notes</code></td>
+                                    <td>TEXT</td>
+                                    <td>NULL</td>
+                                    <td>Ghi chú giao hàng</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE UNIQUE INDEX idx_shipments_order_id ON shipments(order_id);
+CREATE UNIQUE INDEX idx_shipments_tracking_number ON shipments(tracking_number);
+CREATE INDEX idx_shipments_status ON shipments(status);
+CREATE INDEX idx_shipments_carrier ON shipments(carrier);</code></pre>
+
+                    <h3>SQL Create Statement:</h3>
+                    <pre><code class="language-sql">CREATE TABLE shipments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID UNIQUE NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+    tracking_number VARCHAR(50) UNIQUE NOT NULL,
+    carrier VARCHAR(20) NOT NULL CHECK (carrier IN ('GHTK', 'GHN', 'VIETTEL_POST', 'J&T')),
+    shipping_address TEXT NOT NULL,
+    recipient_name VARCHAR(100) NOT NULL,
+    recipient_phone VARCHAR(15) NOT NULL,
+    status VARCHAR(20) DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'PICKED_UP', 'IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DELIVERED', 'FAILED')),
+    estimated_delivery TIMESTAMP,
+    actual_delivery TIMESTAMP,
+    shipping_fee DECIMAL(10,2) DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+                </div>
+            </section>
+
+            <!-- Product Reviews Table -->
+            <section id="product-reviews" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: product_reviews</h2>
+                        <span class="card-badge">E-Commerce</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Mã định danh review</td>
+                                </tr>
+                                <tr>
+                                    <td><code>product_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (products), NOT NULL</td>
+                                    <td>Sản phẩm được đánh giá</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người đánh giá</td>
+                                </tr>
+                                <tr>
+                                    <td><code>order_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (orders), NOT NULL</td>
+                                    <td>Đơn hàng đã mua (xác thực)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>rating</code></td>
+                                    <td>INTEGER</td>
+                                    <td>CHECK (rating BETWEEN 1 AND 5), NOT NULL</td>
+                                    <td>Điểm đánh giá (1-5 sao)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>comment</code></td>
+                                    <td>TEXT</td>
+                                    <td>NULL</td>
+                                    <td>Nhận xét chi tiết</td>
+                                </tr>
+                                <tr>
+                                    <td><code>images</code></td>
+                                    <td>TEXT[]</td>
+                                    <td>NULL</td>
+                                    <td>Array URL hình ảnh review</td>
+                                </tr>
+                                <tr>
+                                    <td><code>helpful_count</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 0</td>
+                                    <td>Số người thấy hữu ích</td>
+                                </tr>
+                                <tr>
+                                    <td><code>is_verified_purchase</code></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT TRUE</td>
+                                    <td>Đã mua hàng xác nhận</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian đánh giá</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE INDEX idx_product_reviews_product_id ON product_reviews(product_id);
+CREATE INDEX idx_product_reviews_user_id ON product_reviews(user_id);
+CREATE INDEX idx_product_reviews_rating ON product_reviews(rating);
+CREATE INDEX idx_product_reviews_created_at ON product_reviews(created_at DESC);
+CREATE UNIQUE INDEX idx_product_reviews_user_product_order ON product_reviews(user_id, product_id, order_id);</code></pre>
+                </div>
+            </section>
+
+            <!-- Warehouses Table -->
+            <section id="warehouses" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: warehouses</h2>
+                        <span class="card-badge">Inventory</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Warehouse unique identifier</td>
+                                </tr>
+                                <tr>
+                                    <td><code>code</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Mã kho (VD: WH-HN-01, WH-HCM-02)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>name</code></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Tên kho (VD: Kho Hà Nội)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>type</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Loại kho: CENTRAL, REGIONAL, RETAIL</td>
+                                </tr>
+                                <tr>
+                                    <td><code>address</code></td>
+                                    <td>TEXT</td>
+                                    <td>NOT NULL</td>
+                                    <td>Địa chỉ kho</td>
+                                </tr>
+                                <tr>
+                                    <td><code>city</code></td>
+                                    <td>VARCHAR(100)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Thành phố (Hà Nội, TP.HCM, Đà Nẵng)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>manager_name</code></td>
+                                    <td>VARCHAR(255)</td>
+                                    <td>NULL</td>
+                                    <td>Tên quản lý kho</td>
+                                </tr>
+                                <tr>
+                                    <td><code>manager_phone</code></td>
+                                    <td>VARCHAR(20)</td>
+                                    <td>NULL</td>
+                                    <td>SĐT quản lý kho</td>
+                                </tr>
+                                <tr>
+                                    <td><code>capacity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 10000</td>
+                                    <td>Sức chứa tối đa (đơn vị sản phẩm)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>is_active</code></td>
+                                    <td>BOOLEAN</td>
+                                    <td>DEFAULT TRUE</td>
+                                    <td>Trạng thái hoạt động</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo</td>
+                                </tr>
+                                <tr>
+                                    <td><code>updated_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian cập nhật</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE UNIQUE INDEX idx_warehouses_code ON warehouses(code);
+CREATE INDEX idx_warehouses_city ON warehouses(city);
+CREATE INDEX idx_warehouses_type ON warehouses(type);
+CREATE INDEX idx_warehouses_is_active ON warehouses(is_active);</code></pre>
+                </div>
+            </section>
+
+            <!-- Inventory Items Table -->
+            <section id="inventory-items" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: inventory_items</h2>
+                        <span class="card-badge">Inventory</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Inventory item unique identifier</td>
+                                </tr>
+                                <tr>
+                                    <td><code>product_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (products), NOT NULL</td>
+                                    <td>Sản phẩm</td>
+                                </tr>
+                                <tr>
+                                    <td><code>warehouse_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (warehouses), NOT NULL</td>
+                                    <td>Kho chứa</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 0, CHECK (quantity >= 0)</td>
+                                    <td>Số lượng tồn kho hiện tại</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reserved_quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 0, CHECK (reserved_quantity >= 0)</td>
+                                    <td>Số lượng đang đặt trước (trong giỏ hàng)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>available_quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>GENERATED ALWAYS AS (quantity - reserved_quantity) STORED</td>
+                                    <td>Số lượng có thể bán = quantity - reserved</td>
+                                </tr>
+                                <tr>
+                                    <td><code>min_stock_level</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 10</td>
+                                    <td>Ngưỡng cảnh báo tồn kho thấp</td>
+                                </tr>
+                                <tr>
+                                    <td><code>max_stock_level</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 1000</td>
+                                    <td>Ngưỡng tồn kho tối đa</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reorder_point</code></td>
+                                    <td>INTEGER</td>
+                                    <td>DEFAULT 20</td>
+                                    <td>Điểm đặt hàng lại tự động</td>
+                                </tr>
+                                <tr>
+                                    <td><code>last_restock_date</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Lần nhập hàng gần nhất</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo</td>
+                                </tr>
+                                <tr>
+                                    <td><code>updated_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian cập nhật</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Business Rules:</strong>
+                        <ul>
+                            <li><code>available_quantity = quantity - reserved_quantity</code></li>
+                            <li>Khi <code>quantity ≤ min_stock_level</code> → Alert LOW_STOCK</li>
+                            <li>Khi <code>quantity ≤ reorder_point</code> → Tự động tạo đơn đặt hàng</li>
+                            <li>Unique constraint: <code>(product_id, warehouse_id)</code></li>
+                        </ul>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE UNIQUE INDEX idx_inventory_product_warehouse ON inventory_items(product_id, warehouse_id);
+CREATE INDEX idx_inventory_warehouse_id ON inventory_items(warehouse_id);
+CREATE INDEX idx_inventory_quantity ON inventory_items(quantity);
+CREATE INDEX idx_inventory_low_stock ON inventory_items(quantity) WHERE quantity <= min_stock_level;</code></pre>
+                </div>
+            </section>
+
+            <!-- Inventory Transactions Table -->
+            <section id="inventory-transactions" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Table: inventory_transactions</h2>
+                        <span class="card-badge">Inventory</span>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Constraints</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>id</code></td>
+                                    <td>UUID</td>
+                                    <td>PRIMARY KEY</td>
+                                    <td>Transaction unique identifier</td>
+                                </tr>
+                                <tr>
+                                    <td><code>transaction_code</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>UNIQUE, NOT NULL</td>
+                                    <td>Mã phiếu (VD: IN-2025-001, OUT-2025-002)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>inventory_item_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (inventory_items), NOT NULL</td>
+                                    <td>Mục tồn kho</td>
+                                </tr>
+                                <tr>
+                                    <td><code>warehouse_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (warehouses), NOT NULL</td>
+                                    <td>Kho thực hiện giao dịch</td>
+                                </tr>
+                                <tr>
+                                    <td><code>transaction_type</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NOT NULL</td>
+                                    <td>Loại: IN (nhập), OUT (xuất), TRANSFER (chuyển), ADJUSTMENT (điều chỉnh), RETURN (trả hàng)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity</code></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL</td>
+                                    <td>Số lượng (dương = nhập, âm = xuất)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity_before</code></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL</td>
+                                    <td>Tồn kho trước giao dịch</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity_after</code></td>
+                                    <td>INTEGER</td>
+                                    <td>NOT NULL</td>
+                                    <td>Tồn kho sau giao dịch</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reason</code></td>
+                                    <td>TEXT</td>
+                                    <td>NOT NULL</td>
+                                    <td>Lý do: PURCHASE_ORDER (đặt hàng NCC), CUSTOMER_ORDER (đơn khách), DAMAGE (hư hỏng), EXPIRED (hết hạn), TRANSFER (chuyển kho)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reference_id</code></td>
+                                    <td>UUID</td>
+                                    <td>NULL</td>
+                                    <td>ID tham chiếu (order_id, transfer_id, etc.)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reference_type</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>NULL</td>
+                                    <td>Loại tham chiếu: ORDER, TRANSFER, ADJUSTMENT</td>
+                                </tr>
+                                <tr>
+                                    <td><code>from_warehouse_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (warehouses), NULL</td>
+                                    <td>Kho nguồn (cho TRANSFER)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>to_warehouse_id</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (warehouses), NULL</td>
+                                    <td>Kho đích (cho TRANSFER)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>unit_cost</code></td>
+                                    <td>DECIMAL(12,2)</td>
+                                    <td>NULL</td>
+                                    <td>Giá nhập/xuất đơn vị</td>
+                                </tr>
+                                <tr>
+                                    <td><code>total_cost</code></td>
+                                    <td>DECIMAL(12,2)</td>
+                                    <td>NULL</td>
+                                    <td>Tổng giá trị = quantity × unit_cost</td>
+                                </tr>
+                                <tr>
+                                    <td><code>notes</code></td>
+                                    <td>TEXT</td>
+                                    <td>NULL</td>
+                                    <td>Ghi chú bổ sung</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_by</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NOT NULL</td>
+                                    <td>Người thực hiện</td>
+                                </tr>
+                                <tr>
+                                    <td><code>approved_by</code></td>
+                                    <td>UUID</td>
+                                    <td>FOREIGN KEY (users), NULL</td>
+                                    <td>Người phê duyệt</td>
+                                </tr>
+                                <tr>
+                                    <td><code>status</code></td>
+                                    <td>VARCHAR(50)</td>
+                                    <td>DEFAULT 'PENDING'</td>
+                                    <td>Trạng thái: PENDING, APPROVED, COMPLETED, CANCELLED</td>
+                                </tr>
+                                <tr>
+                                    <td><code>created_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>DEFAULT CURRENT_TIMESTAMP</td>
+                                    <td>Thời gian tạo phiếu</td>
+                                </tr>
+                                <tr>
+                                    <td><code>completed_at</code></td>
+                                    <td>TIMESTAMP</td>
+                                    <td>NULL</td>
+                                    <td>Thời gian hoàn thành</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Transaction Types:</strong>
+                        <ul>
+                            <li><strong>IN (Nhập kho):</strong> quantity > 0, reason = PURCHASE_ORDER, RETURN</li>
+                            <li><strong>OUT (Xuất kho):</strong> quantity < 0, reason = CUSTOMER_ORDER, DAMAGE, EXPIRED</li>
+                            <li><strong>TRANSFER (Chuyển kho):</strong> Tạo 2 transactions (OUT từ kho nguồn, IN vào kho đích)</li>
+                            <li><strong>ADJUSTMENT (Điều chỉnh):</strong> Kiểm kê, sửa lỗi dữ liệu</li>
+                            <li><strong>RETURN (Trả hàng):</strong> Khách trả hàng, nhập lại kho</li>
+                        </ul>
+                    </div>
+
+                    <h3>Indexes:</h3>
+                    <pre><code class="language-sql">CREATE UNIQUE INDEX idx_inventory_txn_code ON inventory_transactions(transaction_code);
+CREATE INDEX idx_inventory_txn_item_id ON inventory_transactions(inventory_item_id);
+CREATE INDEX idx_inventory_txn_warehouse_id ON inventory_transactions(warehouse_id);
+CREATE INDEX idx_inventory_txn_type ON inventory_transactions(transaction_type);
+CREATE INDEX idx_inventory_txn_reference ON inventory_transactions(reference_id, reference_type);
+CREATE INDEX idx_inventory_txn_created_at ON inventory_transactions(created_at DESC);
+CREATE INDEX idx_inventory_txn_status ON inventory_transactions(status);</code></pre>
+
+                    <h3>Sample Data Flow:</h3>
+                    <div class="code-block">
+                        <pre><code>-- Nhập hàng từ NCC
+INSERT INTO inventory_transactions (
+    transaction_code, inventory_item_id, warehouse_id, 
+    transaction_type, quantity, quantity_before, quantity_after,
+    reason, unit_cost, total_cost, created_by, status
+) VALUES (
+    'IN-2025-001', 'prod-123', 'wh-hanoi', 
+    'IN', 100, 50, 150,
+    'PURCHASE_ORDER', 50000, 5000000, 'user-admin', 'COMPLETED'
+);
+
+-- Xuất hàng cho đơn khách
+INSERT INTO inventory_transactions (
+    transaction_code, inventory_item_id, warehouse_id, 
+    transaction_type, quantity, quantity_before, quantity_after,
+    reason, reference_id, reference_type, created_by, status
+) VALUES (
+    'OUT-2025-002', 'prod-123', 'wh-hanoi', 
+    'OUT', -5, 150, 145,
+    'CUSTOMER_ORDER', 'order-456', 'ORDER', 'user-admin', 'COMPLETED'
+);
+
+-- Chuyển kho Hà Nội → TP.HCM
+-- Bước 1: Xuất từ Hà Nội
+INSERT INTO inventory_transactions VALUES (
+    'TRANSFER-OUT-2025-003', 'prod-123', 'wh-hanoi', 
+    'TRANSFER', -20, 145, 125, 'TRANSFER', 
+    NULL, 'TRANSFER', 'wh-hanoi', 'wh-hcm', ..., 'COMPLETED'
+);
+-- Bước 2: Nhập vào TP.HCM
+INSERT INTO inventory_transactions VALUES (
+    'TRANSFER-IN-2025-003', 'prod-123', 'wh-hcm', 
+    'TRANSFER', 20, 30, 50, 'TRANSFER', 
+    NULL, 'TRANSFER', 'wh-hanoi', 'wh-hcm', ..., 'COMPLETED'
+);</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HealthAI App Database Documentation</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

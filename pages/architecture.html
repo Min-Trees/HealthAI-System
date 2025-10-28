@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HealthAI App - Kiến trúc hệ thống với 17 sơ đồ Mermaid chi tiết">
+    <title>Kiến trúc hệ thống - HealthAI App</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="../index.html" class="nav-link">Trang chủ</a>
+                    <a href="architecture.html" class="nav-link active">Kiến trúc</a>
+                    <a href="functional-flows.html" class="nav-link">Chức năng</a>
+                    <a href="api-docs.html" class="nav-link">API</a>
+                    <a href="database.html" class="nav-link">Database</a>
+                    <a href="quick-start.html" class="nav-link">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Tìm kiếm...">
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Sơ đồ hệ thống</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#diagram-1" class="sidebar-link">1. Overall Architecture</a></li>
+                    <li class="sidebar-item"><a href="#diagram-2" class="sidebar-link">2. Authentication Flow</a></li>
+                    <li class="sidebar-item"><a href="#diagram-3" class="sidebar-link">3. AI Diagnosis Flow</a></li>
+                    <li class="sidebar-item"><a href="#diagram-4" class="sidebar-link">4. Appointment Booking</a></li>
+                    <li class="sidebar-item"><a href="#diagram-5" class="sidebar-link">5. Payment Processing</a></li>
+                    <li class="sidebar-item"><a href="#diagram-6" class="sidebar-link">6. Database Schema</a></li>
+                    <li class="sidebar-item"><a href="#diagram-7" class="sidebar-link">7. Microservices Deployment</a></li>
+                    <li class="sidebar-item"><a href="#diagram-8" class="sidebar-link">8. Security Architecture</a></li>
+                    <li class="sidebar-item"><a href="#diagram-9" class="sidebar-link">9. CI/CD Pipeline</a></li>
+                    <li class="sidebar-item"><a href="#diagram-10" class="sidebar-link">10. Chat & Video Call</a></li>
+                    <li class="sidebar-item"><a href="#diagram-11" class="sidebar-link">11. User Journey</a></li>
+                    <li class="sidebar-item"><a href="#diagram-12" class="sidebar-link">12. Monitoring Stack</a></li>
+                    <li class="sidebar-item"><a href="#diagram-13" class="sidebar-link">13. Team Structure</a></li>
+                    <li class="sidebar-item"><a href="#diagram-14" class="sidebar-link">14. Permissions Matrix</a></li>
+                    <li class="sidebar-item"><a href="#diagram-15" class="sidebar-link">15. Error Handling</a></li>
+                    <li class="sidebar-item"><a href="#diagram-16" class="sidebar-link">16. Deployment Environments</a></li>
+                    <li class="sidebar-item"><a href="#diagram-17" class="sidebar-link">17. Performance Strategy</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Quick Actions</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="../index.html" class="sidebar-link">← Về trang chủ</a></li>
+                    <li class="sidebar-item"><a href="functional-flows.html" class="sidebar-link">Xem luồng chức năng →</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <section class="content-section fade-in">
+                <h1 class="page-title">📐 Kiến trúc hệ thống HealthAI App</h1>
+                <p class="page-subtitle">
+                    17 sơ đồ Mermaid chi tiết về kiến trúc, microservices, deployment và bảo mật
+                </p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Lưu ý:</strong> Tất cả sơ đồ sử dụng Mermaid JS với phiên bản 10.x. 
+                    Click vào sơ đồ để zoom và xem chi tiết.
+                </div>
+            </section>
+
+            <!-- Diagram 1: Overall Architecture -->
+            <section id="diagram-1" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">1. System Architecture - Overall Structure</h2>
+                        <span class="card-badge">Core</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "CLIENT LAYER"
+        A1["📱 React Native Mobile App"]
+        A2["🌐 React Web App"]
+    end
+    
+    subgraph "API & GATEWAY LAYER"
+        B1["🚪 API Gateway<br/>Spring Cloud Gateway"]
+        B2["🔐 Rate Limiter<br/>Auth Check"]
+        B3["⚖️ Load Balancer<br/>Nginx"]
+    end
+    
+    subgraph "SERVICE LAYER"
+        C1["🔐 Auth Service"]
+        C2["👤 User Service"]
+        C3["🏥 Profile Service"]
+        C4["🤖 AI Diagnosis Service"]
+        C5["📅 Appointment Service"]
+        C6["💊 Pharmacy Service"]
+        C7["💳 Payment Service"]
+        C8["🔔 Notification Service"]
+        C9["📍 Location Service"]
+    end
+    
+    subgraph "CACHE LAYER"
+        D1["⚡ Redis Cache<br/>Sessions & Tokens"]
+        D2["🔍 Elasticsearch<br/>Full-text Search"]
+    end
+    
+    subgraph "DATABASE LAYER"
+        E1["🐘 PostgreSQL<br/>Main Database"]
+        E2["🍃 MongoDB<br/>Logs & Analytics"]
+    end
+    
+    subgraph "EXTERNAL SERVICES"
+        F1["🧠 OpenAI API"]
+        F2["💰 VNPAY"]
+        F3["📞 Twilio/SMS"]
+        F4["🔥 Firebase"]
+        F5["🗺️ Google Maps"]
+    end
+    
+    A1 --> B3
+    A2 --> B3
+    B3 --> B1
+    B1 --> B2
+    B2 --> C1
+    B2 --> C2
+    B2 --> C3
+    B2 --> C4
+    B2 --> C5
+    B2 --> C6
+    B2 --> C7
+    B2 --> C8
+    B2 --> C9
+    
+    C1 --> D1
+    C2 --> D1
+    C3 --> E1
+    C4 --> F1
+    C5 --> E1
+    C6 --> E1
+    C7 --> F2
+    C8 --> F4
+    C8 --> F3
+    C9 --> F5
+    
+    D1 --> E1
+    D2 --> E1
+    D2 --> E2
+    C1 --> E2
+    C4 --> E2
+    C7 --> E2
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Mô tả:</h4>
+                        <p>Kiến trúc tổng quát gồm 5 lớp chính: Client Layer (React Native + React), API Gateway Layer, 
+                        Service Layer (9 microservices), Cache Layer, và Database Layer. Hệ thống tích hợp 5 external services.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 2: Authentication Flow -->
+            <section id="diagram-2" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">2. Authentication & User Management Flow</h2>
+                        <span class="card-badge">Security</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant User as 👤 User
+    participant App as 📱 Frontend
+    participant Gateway as 🚪 API Gateway
+    participant Auth as 🔐 Auth Service
+    participant SMS as 📞 Twilio SMS
+    participant Cache as ⚡ Redis
+    participant DB as 🐘 PostgreSQL
+    
+    User->>App: Input Email/Phone
+    App->>Gateway: POST /auth/register
+    Gateway->>Auth: Forward Request
+    Auth->>DB: Check if exists
+    
+    alt User Not Exists
+        Auth->>SMS: Send OTP
+        SMS-->>User: OTP Code
+        Auth->>Cache: Store OTP (TTL: 5min)
+        
+        User->>App: Enter OTP
+        App->>Gateway: POST /auth/otp/verify
+        Gateway->>Auth: Verify OTP
+        Auth->>Cache: Check OTP
+        Cache-->>Auth: Valid ✓
+        
+        Auth->>DB: Create User Account
+        Auth->>Cache: Generate JWT Token
+        Auth-->>App: Return Access + Refresh Token
+        App-->>User: Login Success 🎉
+    else User Exists
+        Auth-->>App: User Already Registered
+    end
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Chi tiết luồng:</h4>
+                        <ul>
+                            <li><strong>Registration:</strong> Email/Phone → OTP SMS → Verify → Create Account → JWT Token</li>
+                            <li><strong>OTP:</strong> 6 digits, TTL 5 minutes, max 3 attempts</li>
+                            <li><strong>JWT:</strong> Access token (1h) + Refresh token (7 days)</li>
+                            <li><strong>Security:</strong> Bcrypt password hash, Redis session storage</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 3: AI Diagnosis Flow -->
+            <section id="diagram-3" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">3. AI Diagnosis Flow</h2>
+                        <span class="card-badge">AI/ML</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Patient as 🏥 Patient
+    participant App as 📱 Mobile App
+    participant AIService as 🤖 AI Service
+    participant OpenAI as 🧠 OpenAI API
+    participant DB as 🐘 PostgreSQL
+    participant MongoDB as 🍃 MongoDB
+    
+    Patient->>App: Input Symptoms
+    App->>AIService: POST /ai/chat
+    AIService->>DB: Get Patient History
+    
+    AIService->>OpenAI: Analyze Symptoms
+    Note over OpenAI: Process with GPT-4 Model
+    OpenAI-->>AIService: Diagnosis Result
+    
+    AIService->>AIService: Calculate Risk Level
+    
+    alt Risk Level: Low
+        AIService-->>App: Self-care Recommendations
+    else Risk Level: Medium
+        AIService-->>App: Recommend Doctor Consultation
+    else Risk Level: High
+        AIService-->>App: Urgent: Go to Hospital ⚠️
+    end
+    
+    AIService->>DB: Save Diagnosis
+    AIService->>MongoDB: Log AI Interaction
+    App-->>Patient: Display Results & Recommendations
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Risk Assessment:</h4>
+                        <ul>
+                            <li><strong>Low Risk:</strong> Tự xử lý tại nhà, gợi ý thuốc OTC</li>
+                            <li><strong>Medium Risk:</strong> Đặt lịch video call với bác sĩ</li>
+                            <li><strong>High Risk:</strong> Khuyến nghị đến cấp cứu ngay</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 4: Appointment Booking -->
+            <section id="diagram-4" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">4. Appointment Booking Flow</h2>
+                        <span class="card-badge">Core Feature</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Patient as 👤 Patient
+    participant App as 📱 App
+    participant AppointmentSvc as 📅 Appointment Svc
+    participant DocService as 👨‍⚕️ Doctor Service
+    participant DB as 🐘 PostgreSQL
+    participant NotificationSvc as 🔔 Notification Svc
+    participant Firebase as 🔥 Firebase
+    
+    Patient->>App: Search for Doctor
+    App->>DocService: GET /doctors?specialty=Cardiology
+    DocService->>DB: Query Available Doctors
+    DB-->>App: Doctor List
+    
+    Patient->>App: Select Doctor & Time
+    App->>AppointmentSvc: POST /appointments/book
+    AppointmentSvc->>DB: Create Appointment
+    
+    AppointmentSvc->>NotificationSvc: Send Notifications
+    
+    par Notify Doctor
+        NotificationSvc->>Firebase: Push to Doctor
+        Firebase->>DocService: 🔔 New Appointment
+    and Notify Patient
+        NotificationSvc->>Firebase: Push to Patient
+        Firebase->>Patient: ✓ Appointment Confirmed
+    end
+    
+    App-->>Patient: Booking Successful
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 5: Payment Processing -->
+            <section id="diagram-5" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">5. Payment & Order Processing</h2>
+                        <span class="card-badge">Payment</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Customer as 🛒 Customer
+    participant Store as 🏪 Store App
+    participant CartSvc as 🛍️ Cart Service
+    participant PaymentSvc as 💳 Payment Service
+    participant VNPAY as 💰 VNPAY Gateway
+    participant DB as 🐘 PostgreSQL
+    participant NotificationSvc as 🔔 Notification
+    
+    Customer->>Store: Add Product to Cart
+    Store->>CartSvc: POST /cart/add
+    CartSvc->>DB: Save Cart Item
+    
+    Customer->>Store: Proceed to Checkout
+    Store->>PaymentSvc: POST /payment/vnpay/create
+    PaymentSvc->>VNPAY: Create Payment Link
+    VNPAY-->>Store: Payment URL
+    Store-->>Customer: Redirect to VNPAY
+    
+    Customer->>VNPAY: Complete Payment
+    VNPAY->>PaymentSvc: Webhook - Payment Success
+    
+    PaymentSvc->>DB: Create Order
+    PaymentSvc->>DB: Update Inventory
+    PaymentSvc->>NotificationSvc: Send Order Confirmation
+    
+    NotificationSvc-->>Customer: 📧 Email + SMS Notification
+    Store-->>Customer: ✓ Order Confirmed
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Payment Methods:</h4>
+                        <ul>
+                            <li>VNPAY QR Code</li>
+                            <li>ATM/Debit Cards</li>
+                            <li>Credit Cards</li>
+                            <li>E-Wallets (Momo, ZaloPay)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 6: Database Schema -->
+            <section id="diagram-6" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">6. Database Schema - ER Diagram</h2>
+                        <span class="card-badge">Database</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+erDiagram
+    USERS ||--o{ USER_PROFILES : has
+    USERS ||--o{ MEDICAL_HISTORY : has
+    USERS ||--o{ APPOINTMENTS : books
+    USERS ||--o{ VITAL_SIGNS : tracks
+    USERS ||--o{ CART_ITEMS : owns
+    USERS ||--o{ ORDERS : places
+    USERS ||--o{ PRESCRIPTIONS : receives
+    
+    DOCTORS ||--o{ APPOINTMENTS : provides
+    DOCTORS ||--o{ DOCTOR_SCHEDULES : has
+    
+    PRODUCTS ||--o{ CART_ITEMS : contains
+    PRODUCTS ||--o{ ORDER_ITEMS : contains
+    PRODUCTS ||--o{ PRESCRIPTIONS : references
+    
+    APPOINTMENTS ||--o{ AI_DIAGNOSES : generates
+    
+    ORDERS ||--o{ ORDER_ITEMS : contains
+    ORDERS ||--o{ PAYMENTS : has
+    
+    USERS {
+        int id PK
+        string email UK
+        string phone UK
+        string password
+        string otp_token
+        boolean is_verified
+        timestamp created_at
+    }
+    
+    USER_PROFILES {
+        int id PK
+        int user_id FK
+        string full_name
+        date dob
+        string address
+        string avatar_url
+        string emergency_contact
+    }
+    
+    DOCTORS {
+        int id PK
+        string name
+        string specialty
+        string license_number
+        int hospital_id FK
+        boolean available
+    }
+    
+    APPOINTMENTS {
+        int id PK
+        int patient_id FK
+        int doctor_id FK
+        string status
+        timestamp appointment_date
+        text notes
+    }
+    
+    PRODUCTS {
+        int id PK
+        string name
+        text description
+        decimal price
+        int stock
+        string category
+        string barcode
+    }
+    
+    ORDERS {
+        int id PK
+        int user_id FK
+        decimal total_amount
+        string status
+        string delivery_address
+        timestamp created_at
+    }
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>10 Core Tables:</h4>
+                        <div class="grid grid-2">
+                            <div>
+                                <ul>
+                                    <li>users - Người dùng</li>
+                                    <li>user_profiles - Hồ sơ</li>
+                                    <li>medical_history - Lịch sử bệnh</li>
+                                    <li>vital_signs - Chỉ số sức khỏe</li>
+                                    <li>doctors - Bác sĩ</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <ul>
+                                    <li>appointments - Lịch hẹn</li>
+                                    <li>products - Sản phẩm</li>
+                                    <li>orders - Đơn hàng</li>
+                                    <li>prescriptions - Toa thuốc</li>
+                                    <li>payments - Thanh toán</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 7: Microservices Deployment -->
+            <section id="diagram-7" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">7. Microservices Deployment Architecture</h2>
+                        <span class="card-badge">DevOps</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "CLOUD PLATFORM (AWS/GCP)"
+        subgraph "LOAD BALANCER"
+            LB["🔄 Nginx Load Balancer<br/>Distribute Traffic"]
+        end
+        
+        subgraph "API GATEWAY"
+            GW["🚪 Spring Cloud Gateway<br/>Rate Limiting, Auth"]
+        end
+        
+        subgraph "SERVICE MESH (Istio)"
+            SM["🔗 Istio Service Mesh<br/>Traffic Management"]
+        end
+        
+        subgraph "KUBERNETES NODES"
+            subgraph "Node 1"
+                P1["Auth Service<br/>Replicas: 3"]
+                P2["User Service<br/>Replicas: 3"]
+            end
+            
+            subgraph "Node 2"
+                P3["AI Service<br/>Replicas: 5"]
+                P4["Appointment Service<br/>Replicas: 2"]
+            end
+            
+            subgraph "Node 3"
+                P5["Payment Service<br/>Replicas: 2"]
+                P6["Store Service<br/>Replicas: 3"]
+            end
+        end
+        
+        subgraph "STORAGE LAYER"
+            DB1["🐘 PostgreSQL<br/>Master + Replicas"]
+            DB2["🍃 MongoDB<br/>ReplicaSet"]
+            CACHE["⚡ Redis Cache<br/>Cluster"]
+            ES["🔍 Elasticsearch<br/>Cluster"]
+        end
+        
+        subgraph "MONITORING & LOGGING"
+            MON["📊 Prometheus<br/>Metrics"]
+            LOG["📝 ELK Stack<br/>Logs"]
+            DASH["📈 Grafana<br/>Dashboards"]
+        end
+        
+        subgraph "CI/CD"
+            CI["🔨 Jenkins<br/>Build & Deploy"]
+        end
+    end
+    
+    LB --> GW
+    GW --> SM
+    SM --> P1
+    SM --> P2
+    SM --> P3
+    SM --> P4
+    SM --> P5
+    SM --> P6
+    
+    P1 --> DB1
+    P2 --> DB1
+    P3 --> DB2
+    P4 --> DB1
+    P5 --> DB1
+    P6 --> DB1
+    
+    P1 --> CACHE
+    P2 --> CACHE
+    
+    DB1 --> ES
+    DB2 --> LOG
+    
+    MON -.-> P1
+    MON -.-> P3
+    LOG -.-> P2
+    LOG -.-> P6
+    DASH -.-> MON
+    
+    CI -.-> P1
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Deployment Strategy:</h4>
+                        <ul>
+                            <li><strong>Container:</strong> Docker cho tất cả services</li>
+                            <li><strong>Orchestration:</strong> Kubernetes với Istio Service Mesh</li>
+                            <li><strong>Scaling:</strong> Horizontal Pod Autoscaler (HPA)</li>
+                            <li><strong>High Availability:</strong> 2-5 replicas per service</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 8: Security Architecture -->
+            <section id="diagram-8" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">8. Security Architecture (6 Layers)</h2>
+                        <span class="card-badge">Security</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "EXTERNAL THREATS"
+        EXT["🌐 Internet<br/>Users & Attacks"]
+    end
+    
+    subgraph "LAYER 1: NETWORK SECURITY"
+        WAF["🛡️ WAF (Cloudflare)<br/>DDoS + Bot Protection"]
+        CDN["📡 CDN<br/>Content Delivery"]
+    end
+    
+    subgraph "LAYER 2: GATEWAY SECURITY"
+        GW["🚪 API Gateway<br/>Rate Limiting<br/>CORS Validation<br/>Request Signing"]
+    end
+    
+    subgraph "LAYER 3: APPLICATION SECURITY"
+        AUTH["🔐 Spring Security<br/>JWT Validation<br/>RBAC<br/>CSRF Protection"]
+    end
+    
+    subgraph "LAYER 4: DATA SECURITY"
+        ENC["🔒 Encryption<br/>AES-256 at Rest<br/>TLS 1.3 in Transit"]
+    end
+    
+    subgraph "LAYER 5: DATABASE SECURITY"
+        DB["🐘 PostgreSQL<br/>SQL Injection Prevention<br/>Row-Level Security<br/>Audit Logging"]
+    end
+    
+    subgraph "LAYER 6: COMPLIANCE"
+        COMP["✅ HIPAA + GDPR<br/>Data Retention<br/>Consent Management<br/>Right to Delete"]
+    end
+    
+    EXT --> WAF
+    WAF --> CDN
+    CDN --> GW
+    GW --> AUTH
+    AUTH --> ENC
+    ENC --> DB
+    DB --> COMP
+    
+    style WAF fill:#ff9999
+    style AUTH fill:#ffcc99
+    style ENC fill:#ffff99
+    style DB fill:#99ff99
+    style COMP fill:#99ccff
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Security Measures:</h4>
+                        <div class="grid grid-2">
+                            <div>
+                                <h5>Prevention:</h5>
+                                <ul>
+                                    <li>WAF & DDoS protection</li>
+                                    <li>Rate limiting (100 req/min)</li>
+                                    <li>JWT with RS256</li>
+                                    <li>CORS validation</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5>Compliance:</h5>
+                                <ul>
+                                    <li>HIPAA healthcare standards</li>
+                                    <li>GDPR data protection</li>
+                                    <li>Audit logging</li>
+                                    <li>Data encryption</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 9: CI/CD Pipeline -->
+            <section id="diagram-9" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">9. CI/CD Pipeline (Jenkins)</h2>
+                        <span class="card-badge">DevOps</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph LR
+    GIT["📂 Git Repository"] 
+    TRIGGER["🔔 Webhook<br/>Trigger"]
+    BUILD["🔨 Build Stage<br/>Compile Code<br/>Dependency Check"]
+    TEST["✅ Test Stage<br/>Unit Tests<br/>Integration Tests<br/>Coverage >70%"]
+    SCAN["🔍 Security Scan<br/>OWASP<br/>Dependency Scan<br/>Code Quality"]
+    DOCKER["🐳 Docker Build<br/>Create Image<br/>Tag & Push"]
+    REGISTRY["📦 Docker Registry<br/>ECR/DockerHub"]
+    
+    subgraph "STAGING"
+        STAGING["🚀 Deploy to Staging<br/>Kubernetes"]
+        SMOKE["✓ Smoke Tests<br/>Health Checks"]
+    end
+    
+    subgraph "PRODUCTION"
+        PROD["🚀 Deploy to Production<br/>Blue-Green<br/>Kubernetes"]
+        MONITOR["📊 Monitor & Alert<br/>Prometheus<br/>Grafana"]
+    end
+    
+    GIT --> TRIGGER
+    TRIGGER --> BUILD
+    BUILD --> TEST
+    TEST --> SCAN
+    SCAN --> DOCKER
+    DOCKER --> REGISTRY
+    REGISTRY --> STAGING
+    STAGING --> SMOKE
+    SMOKE --> PROD
+    PROD --> MONITOR
+    
+    style TRIGGER fill:#ffcccc
+    style BUILD fill:#ffffcc
+    style TEST fill:#ccffcc
+    style SCAN fill:#ccffff
+    style PROD fill:#ffccff
+                        </div>
+                    </div>
+                    
+                    <div class="mt-2">
+                        <h4>Pipeline Stages:</h4>
+                        <ol>
+                            <li><strong>Trigger:</strong> Git push → Webhook → Jenkins</li>
+                            <li><strong>Build:</strong> Maven/Gradle compile + dependency check</li>
+                            <li><strong>Test:</strong> JUnit + Integration tests (min 70% coverage)</li>
+                            <li><strong>Security:</strong> OWASP, SonarQube, dependency vulnerabilities</li>
+                            <li><strong>Docker:</strong> Build & push image to registry</li>
+                            <li><strong>Staging:</strong> Deploy to staging K8s cluster</li>
+                            <li><strong>Production:</strong> Blue-Green deployment</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 10: Chat & Video Call Flow -->
+            <section id="diagram-10" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">10. Chat & Video Call Flow</h2>
+                        <span class="card-badge">Telemedicine</span>
+                    </div>
+                    
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant P as Patient
+    participant WS as WebSocket Server
+    participant CS as Chat Service
+    participant VS as Video Service
+    participant D as Doctor
+    participant DB as Database
+    participant RTC as WebRTC/Jitsi
+
+    Note over P,D: Chat Flow
+    P->>CS: POST /chat/conversations/create
+    CS->>DB: Create conversation
+    CS->>WS: Notify doctor (online)
+    WS->>D: New chat request
+    D->>CS: Accept conversation
+    CS->>WS: Connection established
+    
+    P->>WS: Send message (WebSocket)
+    WS->>CS: Process message
+    CS->>DB: Save message
+    CS->>WS: Broadcast to doctor
+    WS->>D: Receive message
+    D->>WS: Mark as read
+    WS->>CS: Update read status
+    CS->>DB: Update is_read = true
+
+    Note over P,D: File Upload Flow
+    P->>CS: POST /chat/messages/upload (multipart)
+    CS->>S3: Upload file
+    S3-->>CS: File URL
+    CS->>DB: Save message with file URL
+    CS->>WS: Broadcast file message
+    WS->>D: Receive file notification
+
+    Note over P,D: Video Call Flow
+    D->>VS: POST /video-call/create-room
+    VS->>DB: Create room record
+    VS->>RTC: Initialize room (Jitsi/Agora)
+    RTC-->>VS: Room credentials
+    VS-->>D: Room URL + host token
+    
+    D->>WS: Send video call invite
+    WS->>P: Incoming call notification
+    P->>VS: GET /video-call/rooms/{id}/token
+    VS-->>P: Guest token + TURN/STUN config
+    
+    P->>RTC: Join room (WebRTC handshake)
+    D->>RTC: Already in room
+    RTC->>RTC: Establish P2P connection
+    Note over P,D: Audio/Video streaming via WebRTC
+    
+    D->>VS: PUT /video-call/rooms/{id}/end
+    VS->>RTC: Stop recording
+    RTC-->>VS: Recording URL
+    VS->>DB: Save call history
+    VS->>WS: Call ended notification
+    WS->>P: Call ended
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <h4>Key Features:</h4>
+                        <ul>
+                            <li><strong>Real-time Chat:</strong> WebSocket (Socket.IO) với Redis PubSub để scale</li>
+                            <li><strong>File Sharing:</strong> Upload hình ảnh, PDF (medical reports) lên S3/CDN</li>
+                            <li><strong>Video Call:</strong> WebRTC P2P với TURN/STUN servers</li>
+                            <li><strong>Recording:</strong> Optional recording cho mục đích medical records</li>
+                            <li><strong>Typing Indicator:</strong> Real-time "đang gõ..." notification</li>
+                            <li><strong>Read Receipts:</strong> Đánh dấu tin nhắn đã đọc</li>
+                            <li><strong>End-to-End Encryption:</strong> Mã hóa tin nhắn và video stream</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box mt-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Security Note:</strong> 
+                        Video calls use TLS 1.3 for signaling and DTLS-SRTP for media encryption.
+                        Chat messages are encrypted at rest (AES-256) in database.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 11: User Journey Map -->
+            <section id="diagram-11" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">11. User Journey Map</h2>
+                        <span class="card-badge">UX Flow</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+journey
+    title Patient User Journey - HealthAI App
+    section Registration
+      Download App: 5: Patient
+      Sign Up with Email/Phone: 4: Patient
+      Verify OTP: 3: Patient
+      Complete Profile: 4: Patient
+      Health Profile Setup: 3: Patient
+    section AI Diagnosis
+      Enter Symptoms: 4: Patient
+      Upload Medical Images: 3: Patient
+      Receive AI Analysis: 5: Patient, AI
+      Get Doctor Recommendations: 5: Patient, AI
+    section Book Appointment
+      Search Doctors: 4: Patient
+      Check Available Slots: 4: Patient
+      Book Appointment: 5: Patient
+      Make Payment: 3: Patient
+      Receive Confirmation: 5: Patient
+    section Consultation
+      Join Video Call: 4: Patient, Doctor
+      Discuss Symptoms: 5: Patient, Doctor
+      Receive Prescription: 5: Patient, Doctor
+      Rate Experience: 4: Patient
+    section Pharmacy Order
+      Browse Medicines: 4: Patient
+      Add to Cart: 5: Patient
+      Checkout & Pay: 3: Patient
+      Track Delivery: 4: Patient
+      Receive Order: 5: Patient
+                        </div>
+                    </div>
+
+                    <h3>Journey Insights:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Phase</th>
+                                    <th>Touchpoints</th>
+                                    <th>Pain Points</th>
+                                    <th>Opportunities</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Registration</strong></td>
+                                    <td>App Store, Email, SMS</td>
+                                    <td>Complex OTP verification</td>
+                                    <td>Social login (Google, Facebook)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AI Diagnosis</strong></td>
+                                    <td>Symptom input, Image upload</td>
+                                    <td>Unclear symptom descriptions</td>
+                                    <td>Voice input, symptom suggestions</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Appointment</strong></td>
+                                    <td>Search, Calendar, Payment</td>
+                                    <td>Limited available slots</td>
+                                    <td>Waitlist, instant booking</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Consultation</strong></td>
+                                    <td>Video call, Chat, Prescription</td>
+                                    <td>Network quality issues</td>
+                                    <td>Offline mode, call recording</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Pharmacy</strong></td>
+                                    <td>Store, Cart, Delivery</td>
+                                    <td>Out of stock items</td>
+                                    <td>Alternative suggestions, express delivery</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="success-box mt-2">
+                        <strong>Key Metrics:</strong>
+                        <ul>
+                            <li><strong>Registration Completion Rate:</strong> 85% (target: 90%)</li>
+                            <li><strong>AI Diagnosis Usage:</strong> 70% of new users</li>
+                            <li><strong>Appointment Booking Rate:</strong> 45% after AI diagnosis</li>
+                            <li><strong>Consultation Satisfaction:</strong> 4.6/5 stars</li>
+                            <li><strong>Pharmacy Order Conversion:</strong> 35% of consultations</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 12: Monitoring Stack -->
+            <section id="diagram-12" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">12. Monitoring & Observability Stack</h2>
+                        <span class="card-badge">DevOps</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "Application Layer"
+        A1[API Gateway]
+        A2[Auth Service]
+        A3[User Service]
+        A4[AI Service]
+        A5[Appointment Service]
+        A6[Payment Service]
+        A7[Store Service]
+        A8[Chat Service]
+        A9[Inventory Service]
+    end
+
+    subgraph "Metrics Collection"
+        M1[Prometheus]
+        M2[Micrometer]
+        M3[Node Exporter]
+        M4[PostgreSQL Exporter]
+        M5[Redis Exporter]
+    end
+
+    subgraph "Logging"
+        L1[Logback/Log4j2]
+        L2[Logstash]
+        L3[Elasticsearch]
+        L4[Kibana]
+        L5[Filebeat]
+    end
+
+    subgraph "Tracing"
+        T1[Zipkin/Jaeger]
+        T2[Spring Cloud Sleuth]
+    end
+
+    subgraph "Alerting"
+        AL1[Alertmanager]
+        AL2[PagerDuty]
+        AL3[Slack Webhook]
+        AL4[Email SMTP]
+    end
+
+    subgraph "Visualization"
+        V1[Grafana]
+        V2[Custom Dashboards]
+    end
+
+    subgraph "APM"
+        AP1[New Relic]
+        AP2[Datadog]
+    end
+
+    A1 --> M2
+    A2 --> M2
+    A3 --> M2
+    A4 --> M2
+    A5 --> M2
+    A6 --> M2
+    A7 --> M2
+    A8 --> M2
+    A9 --> M2
+
+    M2 --> M1
+    M3 --> M1
+    M4 --> M1
+    M5 --> M1
+
+    A1 --> L1
+    A2 --> L1
+    A3 --> L1
+    L1 --> L5
+    L5 --> L2
+    L2 --> L3
+    L3 --> L4
+
+    A1 --> T2
+    A2 --> T2
+    T2 --> T1
+
+    M1 --> AL1
+    AL1 --> AL2
+    AL1 --> AL3
+    AL1 --> AL4
+
+    M1 --> V1
+    L3 --> V1
+    T1 --> V1
+    V1 --> V2
+
+    A1 --> AP1
+    A2 --> AP1
+    AP1 --> AP2
+
+    style M1 fill:#e8f5e9
+    style L3 fill:#e3f2fd
+    style T1 fill:#fff3e0
+    style V1 fill:#f3e5f5
+    style AL1 fill:#ffebee
+                        </div>
+                    </div>
+
+                    <h3>Monitoring Components:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Purpose</th>
+                                    <th>Retention</th>
+                                    <th>Alerts</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Prometheus</strong></td>
+                                    <td>Metrics collection & storage</td>
+                                    <td>30 days</td>
+                                    <td>CPU > 80%, Memory > 85%, Disk > 90%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Grafana</strong></td>
+                                    <td>Visualization & dashboards</td>
+                                    <td>N/A</td>
+                                    <td>Dashboard alerts to Slack</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Elasticsearch</strong></td>
+                                    <td>Log storage & search</td>
+                                    <td>90 days</td>
+                                    <td>Error rate > 1%, 5xx responses</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kibana</strong></td>
+                                    <td>Log visualization</td>
+                                    <td>N/A</td>
+                                    <td>Custom log pattern alerts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Zipkin/Jaeger</strong></td>
+                                    <td>Distributed tracing</td>
+                                    <td>7 days</td>
+                                    <td>Latency > 500ms, timeouts</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Alertmanager</strong></td>
+                                    <td>Alert routing & grouping</td>
+                                    <td>N/A</td>
+                                    <td>PagerDuty (critical), Slack (warning)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-chart-line"></i>
+                        <strong>Key Metrics Tracked:</strong>
+                        <ul>
+                            <li><strong>Golden Signals:</strong> Latency, Traffic, Errors, Saturation</li>
+                            <li><strong>Business Metrics:</strong> Registrations/day, Appointments/hour, Revenue/day</li>
+                            <li><strong>SLIs:</strong> API availability (99.9%), Response time (p95 < 200ms)</li>
+                            <li><strong>Infrastructure:</strong> CPU, Memory, Disk, Network I/O</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 13: Team Structure -->
+            <section id="diagram-13" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">13. Development Team Structure</h2>
+                        <span class="card-badge">Organization</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TD
+    CEO[CEO/Founder]
+    
+    CTO[CTO - Chief Technology Officer]
+    CPO[CPO - Chief Product Officer]
+    COO[COO - Chief Operations Officer]
+    
+    CEO --> CTO
+    CEO --> CPO
+    CEO --> COO
+    
+    subgraph "Engineering Teams"
+        EM1[Engineering Manager - Backend]
+        EM2[Engineering Manager - Frontend]
+        EM3[Engineering Manager - Mobile]
+        EM4[Engineering Manager - AI/ML]
+        
+        CTO --> EM1
+        CTO --> EM2
+        CTO --> EM3
+        CTO --> EM4
+        
+        BE1[Backend Team Lead]
+        BE2[Senior Backend Dev 1]
+        BE3[Senior Backend Dev 2]
+        BE4[Backend Dev 1]
+        BE5[Backend Dev 2]
+        
+        EM1 --> BE1
+        BE1 --> BE2
+        BE1 --> BE3
+        BE1 --> BE4
+        BE1 --> BE5
+        
+        FE1[Frontend Team Lead]
+        FE2[Senior Frontend Dev]
+        FE3[Frontend Dev 1]
+        FE4[Frontend Dev 2]
+        
+        EM2 --> FE1
+        FE1 --> FE2
+        FE1 --> FE3
+        FE1 --> FE4
+        
+        MB1[Mobile Team Lead]
+        MB2[iOS Developer]
+        MB3[Android Developer]
+        MB4[React Native Developer]
+        
+        EM3 --> MB1
+        MB1 --> MB2
+        MB1 --> MB3
+        MB1 --> MB4
+        
+        AI1[AI Team Lead]
+        AI2[ML Engineer 1]
+        AI3[ML Engineer 2]
+        AI4[Data Scientist]
+        
+        EM4 --> AI1
+        AI1 --> AI2
+        AI1 --> AI3
+        AI1 --> AI4
+    end
+    
+    subgraph "Infrastructure & DevOps"
+        DO1[DevOps Lead]
+        DO2[DevOps Engineer 1]
+        DO3[DevOps Engineer 2]
+        DO4[SRE Engineer]
+        
+        CTO --> DO1
+        DO1 --> DO2
+        DO1 --> DO3
+        DO1 --> DO4
+    end
+    
+    subgraph "Product Team"
+        PM1[Product Manager - Core]
+        PM2[Product Manager - Store]
+        PM3[Product Designer]
+        PM4[UX Researcher]
+        
+        CPO --> PM1
+        CPO --> PM2
+        CPO --> PM3
+        CPO --> PM4
+    end
+    
+    subgraph "QA & Testing"
+        QA1[QA Lead]
+        QA2[QA Engineer 1]
+        QA3[QA Engineer 2]
+        QA4[Automation Tester]
+        
+        CTO --> QA1
+        QA1 --> QA2
+        QA1 --> QA3
+        QA1 --> QA4
+    end
+    
+    subgraph "Operations"
+        OP1[Operations Manager]
+        OP2[Customer Support Lead]
+        OP3[Support Agent 1]
+        OP4[Support Agent 2]
+        OP5[Medical Content Manager]
+        
+        COO --> OP1
+        OP1 --> OP2
+        OP2 --> OP3
+        OP2 --> OP4
+        OP1 --> OP5
+    end
+
+    style CEO fill:#ff6b6b
+    style CTO fill:#4ecdc4
+    style CPO fill:#45b7d1
+    style COO fill:#96ceb4
+    style EM1 fill:#dfe6e9
+    style EM2 fill:#dfe6e9
+    style EM3 fill:#dfe6e9
+    style EM4 fill:#dfe6e9
+                        </div>
+                    </div>
+
+                    <h3>Team Composition:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Headcount</th>
+                                    <th>Key Responsibilities</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Backend Engineering</strong></td>
+                                    <td>5 engineers</td>
+                                    <td>Microservices, APIs, Database design, Integration</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Frontend Engineering</strong></td>
+                                    <td>4 engineers</td>
+                                    <td>React web app, UI/UX implementation, State management</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mobile Engineering</strong></td>
+                                    <td>4 engineers</td>
+                                    <td>iOS, Android, React Native cross-platform</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AI/ML Engineering</strong></td>
+                                    <td>4 engineers</td>
+                                    <td>AI diagnosis models, ML pipelines, Data analysis</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DevOps & SRE</strong></td>
+                                    <td>4 engineers</td>
+                                    <td>CI/CD, Infrastructure, Monitoring, Security</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Product</strong></td>
+                                    <td>4 members</td>
+                                    <td>Product roadmap, User research, Design</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>QA & Testing</strong></td>
+                                    <td>4 engineers</td>
+                                    <td>Manual testing, Automation, Performance testing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Operations</strong></td>
+                                    <td>5 members</td>
+                                    <td>Customer support, Content management, Operations</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="success-box mt-2">
+                        <strong>Total Team Size:</strong> ~35 people
+                        <ul>
+                            <li><strong>Engineering:</strong> 25 engineers (70%)</li>
+                            <li><strong>Product:</strong> 4 members (12%)</li>
+                            <li><strong>Operations:</strong> 5 members (14%)</li>
+                            <li><strong>Leadership:</strong> 4 executives (4%)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 14: Permissions Matrix -->
+            <section id="diagram-14" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">14. Role-Based Access Control (RBAC) Matrix</h2>
+                        <span class="card-badge">Security</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph LR
+    subgraph "Roles"
+        R1[ADMIN]
+        R2[DOCTOR]
+        R3[PATIENT]
+        R4[PHARMACIST]
+        R5[WAREHOUSE_MANAGER]
+        R6[SUPPORT_AGENT]
+    end
+
+    subgraph "User Management"
+        P1[Create User]
+        P2[Edit User]
+        P3[Delete User]
+        P4[View Users]
+    end
+
+    subgraph "Appointments"
+        A1[Book Appointment]
+        A2[Cancel Appointment]
+        A3[View Appointments]
+        A4[Manage Slots]
+    end
+
+    subgraph "Medical Records"
+        M1[View Own Records]
+        M2[View Patient Records]
+        M3[Create Prescription]
+        M4[Edit Prescription]
+    end
+
+    subgraph "Store/Pharmacy"
+        S1[Browse Products]
+        S2[Place Order]
+        S3[Manage Products]
+        S4[View All Orders]
+        S5[Process Orders]
+    end
+
+    subgraph "Inventory"
+        I1[View Stock]
+        I2[Create Transaction]
+        I3[Approve Transaction]
+        I4[Manage Warehouses]
+    end
+
+    R1 --> P1
+    R1 --> P2
+    R1 --> P3
+    R1 --> P4
+    R1 --> A4
+    R1 --> M2
+    R1 --> S3
+    R1 --> S4
+    R1 --> I3
+    R1 --> I4
+
+    R2 --> A3
+    R2 --> A4
+    R2 --> M2
+    R2 --> M3
+    R2 --> M4
+
+    R3 --> A1
+    R3 --> A2
+    R3 --> A3
+    R3 --> M1
+    R3 --> S1
+    R3 --> S2
+
+    R4 --> S3
+    R4 --> S4
+    R4 --> S5
+    R4 --> I1
+
+    R5 --> I1
+    R5 --> I2
+    R5 --> I3
+    R5 --> I4
+
+    R6 --> P4
+    R6 --> A3
+    R6 --> S4
+
+    style R1 fill:#ff6b6b
+    style R2 fill:#4ecdc4
+    style R3 fill:#45b7d1
+    style R4 fill:#96ceb4
+    style R5 fill:#feca57
+    style R6 fill:#a29bfe
+                        </div>
+                    </div>
+
+                    <h3>Detailed Permissions Matrix:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Resource</th>
+                                    <th>ADMIN</th>
+                                    <th>DOCTOR</th>
+                                    <th>PATIENT</th>
+                                    <th>PHARMACIST</th>
+                                    <th>WAREHOUSE_MGR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Users</strong></td>
+                                    <td>CRUD</td>
+                                    <td>Read (limited)</td>
+                                    <td>Read (self)</td>
+                                    <td>Read (limited)</td>
+                                    <td>None</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Appointments</strong></td>
+                                    <td>CRUD</td>
+                                    <td>CRU (own)</td>
+                                    <td>CR (own)</td>
+                                    <td>Read</td>
+                                    <td>None</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Medical Records</strong></td>
+                                    <td>CRUD</td>
+                                    <td>CRUD (patients)</td>
+                                    <td>Read (own)</td>
+                                    <td>None</td>
+                                    <td>None</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Prescriptions</strong></td>
+                                    <td>CRUD</td>
+                                    <td>CRUD</td>
+                                    <td>Read (own)</td>
+                                    <td>Read</td>
+                                    <td>None</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Products</strong></td>
+                                    <td>CRUD</td>
+                                    <td>Read</td>
+                                    <td>Read</td>
+                                    <td>CRUD</td>
+                                    <td>Read</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Orders</strong></td>
+                                    <td>CRUD</td>
+                                    <td>None</td>
+                                    <td>CR (own)</td>
+                                    <td>RU (process)</td>
+                                    <td>Read</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Inventory</strong></td>
+                                    <td>CRUD</td>
+                                    <td>None</td>
+                                    <td>None</td>
+                                    <td>Read</td>
+                                    <td>CRUD</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Warehouses</strong></td>
+                                    <td>CRUD</td>
+                                    <td>None</td>
+                                    <td>None</td>
+                                    <td>None</td>
+                                    <td>CRUD</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reports</strong></td>
+                                    <td>All</td>
+                                    <td>Medical</td>
+                                    <td>None</td>
+                                    <td>Sales</td>
+                                    <td>Inventory</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning mt-2">
+                        <i class="fas fa-shield-alt"></i>
+                        <strong>Security Rules:</strong>
+                        <ul>
+                            <li><strong>Principle of Least Privilege:</strong> Users have minimum permissions needed</li>
+                            <li><strong>Data Isolation:</strong> Patients can only access their own data</li>
+                            <li><strong>Audit Logging:</strong> All permission changes logged</li>
+                            <li><strong>Multi-Factor Auth:</strong> Required for ADMIN, DOCTOR roles</li>
+                            <li><strong>Session Timeout:</strong> 24h for PATIENT, 8h for ADMIN/DOCTOR</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 15: Error Handling Flow -->
+            <section id="diagram-15" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">15. Error Handling & Recovery Flow</h2>
+                        <span class="card-badge">Resilience</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+flowchart TD
+    Start[Request Received]
+    
+    Start --> Validate{Validate Input}
+    
+    Validate -->|Valid| Auth{Authenticate}
+    Validate -->|Invalid| E1[400 Bad Request]
+    
+    Auth -->|Success| Authorize{Authorize}
+    Auth -->|Failure| E2[401 Unauthorized]
+    
+    Authorize -->|Allowed| Process[Process Request]
+    Authorize -->|Denied| E3[403 Forbidden]
+    
+    Process --> DB{Database Query}
+    
+    DB -->|Success| Check{Resource Exists?}
+    DB -->|Connection Error| Retry1{Retry 3x}
+    DB -->|Timeout| E5[504 Gateway Timeout]
+    
+    Retry1 -->|Success| Check
+    Retry1 -->|All Failed| CB{Circuit Breaker}
+    
+    CB -->|Open| E6[503 Service Unavailable]
+    CB -->|Half-Open| Retry2[Retry Once]
+    
+    Retry2 -->|Success| Check
+    Retry2 -->|Failed| E6
+    
+    Check -->|Yes| Transform[Transform Data]
+    Check -->|No| E4[404 Not Found]
+    
+    Transform --> External{Call External API?}
+    
+    External -->|No| Success[200 OK]
+    External -->|Yes| ExtCall[External API Call]
+    
+    ExtCall --> ExtCheck{Response OK?}
+    
+    ExtCheck -->|Yes| Success
+    ExtCheck -->|Network Error| ExtRetry{Retry with Backoff}
+    ExtCheck -->|API Error| E7[502 Bad Gateway]
+    
+    ExtRetry -->|Success| Success
+    ExtRetry -->|Failed| Fallback{Fallback Available?}
+    
+    Fallback -->|Yes| UseFallback[Use Cached/Default]
+    Fallback -->|No| E7
+    
+    UseFallback --> PartialSuccess[206 Partial Content]
+    
+    E1 --> LogError[Log Error]
+    E2 --> LogError
+    E3 --> LogError
+    E4 --> LogError
+    E5 --> LogError
+    E6 --> LogError
+    E7 --> LogError
+    
+    LogError --> Notify{Critical Error?}
+    
+    Notify -->|Yes| Alert[Send Alert to PagerDuty]
+    Notify -->|No| Metrics[Update Metrics]
+    
+    Alert --> Metrics
+    
+    Metrics --> Response[Return Error Response]
+    
+    Success --> Metrics
+    PartialSuccess --> Metrics
+
+    style Start fill:#e3f2fd
+    style Success fill:#c8e6c9
+    style PartialSuccess fill:#fff9c4
+    style E1 fill:#ffcdd2
+    style E2 fill:#ffcdd2
+    style E3 fill:#ffcdd2
+    style E4 fill:#ffcdd2
+    style E5 fill:#ffcdd2
+    style E6 fill:#ffcdd2
+    style E7 fill:#ffcdd2
+    style CB fill:#ffe0b2
+    style Fallback fill:#ffe0b2
+                        </div>
+                    </div>
+
+                    <h3>Error Response Format:</h3>
+                    <pre><code class="language-json">{
+  "success": false,
+  "error": {
+    "code": "RESOURCE_NOT_FOUND",
+    "message": "Không tìm thấy bác sĩ với ID này",
+    "details": {
+      "resource": "doctor",
+      "id": "doctor-uuid-123"
+    },
+    "timestamp": "2025-10-28T10:30:00Z",
+    "trace_id": "abc123def456",
+    "request_id": "req-789xyz"
+  },
+  "status": 404
+}</code></pre>
+
+                    <h3>Error Codes & Recovery:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Error Code</th>
+                                    <th>HTTP Status</th>
+                                    <th>Recovery Strategy</th>
+                                    <th>Retry?</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>VALIDATION_ERROR</code></td>
+                                    <td>400</td>
+                                    <td>Show validation errors to user</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>UNAUTHORIZED</code></td>
+                                    <td>401</td>
+                                    <td>Refresh token or redirect to login</td>
+                                    <td>Yes (once)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>FORBIDDEN</code></td>
+                                    <td>403</td>
+                                    <td>Show permission denied message</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>RESOURCE_NOT_FOUND</code></td>
+                                    <td>404</td>
+                                    <td>Show "not found" page</td>
+                                    <td>No</td>
+                                </tr>
+                                <tr>
+                                    <td><code>RATE_LIMIT_EXCEEDED</code></td>
+                                    <td>429</td>
+                                    <td>Exponential backoff retry</td>
+                                    <td>Yes (with delay)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>INTERNAL_SERVER_ERROR</code></td>
+                                    <td>500</td>
+                                    <td>Retry with circuit breaker</td>
+                                    <td>Yes (3x)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>SERVICE_UNAVAILABLE</code></td>
+                                    <td>503</td>
+                                    <td>Use fallback/cached data</td>
+                                    <td>Yes (3x)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>GATEWAY_TIMEOUT</code></td>
+                                    <td>504</td>
+                                    <td>Increase timeout, retry</td>
+                                    <td>Yes (2x)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="warning-box mt-2">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Resilience Patterns:</strong>
+                        <ul>
+                            <li><strong>Circuit Breaker:</strong> Open after 5 failures in 1 min, half-open after 30s</li>
+                            <li><strong>Retry Policy:</strong> Max 3 retries with exponential backoff (2s, 4s, 8s)</li>
+                            <li><strong>Timeout:</strong> API Gateway: 30s, Database: 5s, External API: 10s</li>
+                            <li><strong>Bulkhead:</strong> Thread pool isolation per service (max 50 threads)</li>
+                            <li><strong>Fallback:</strong> Cached data (5 min TTL), default values, graceful degradation</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 16: Deployment Environments -->
+            <section id="diagram-16" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">16. Deployment Environments</h2>
+                        <span class="card-badge">Infrastructure</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "Development Environment"
+        DEV1[Local Docker Compose]
+        DEV2[Dev Database - PostgreSQL]
+        DEV3[Dev Redis]
+        DEV4[Mock External APIs]
+        DEV5[H2 In-Memory DB Option]
+    end
+
+    subgraph "Testing Environment"
+        TEST1[Kubernetes Cluster - Staging]
+        TEST2[Test Database - RDS]
+        TEST3[Test Redis - ElastiCache]
+        TEST4[Selenium Grid]
+        TEST5[JMeter Load Testing]
+    end
+
+    subgraph "Staging Environment"
+        STG1[Kubernetes Cluster - GKE/EKS]
+        STG2[Staging Database - RDS]
+        STG3[Staging Redis - ElastiCache]
+        STG4[Real Payment APIs - Sandbox]
+        STG5[Monitoring - Prometheus/Grafana]
+        STG6[ELK Stack]
+    end
+
+    subgraph "Production Environment"
+        PROD1[Kubernetes Cluster - Multi-AZ]
+        PROD2[Production RDS - Multi-AZ]
+        PROD3[Redis Cluster - 6 nodes]
+        PROD4[CDN - CloudFront/Cloudflare]
+        PROD5[Load Balancer - ALB]
+        PROD6[Auto Scaling Groups]
+        PROD7[Backup - S3 Glacier]
+        PROD8[Monitoring - Full Stack]
+    end
+
+    subgraph "DR Environment"
+        DR1[Disaster Recovery - Different Region]
+        DR2[DR Database Replica]
+        DR3[Cross-Region Replication]
+        DR4[Failover DNS - Route53]
+    end
+
+    DEV1 -->|CI/CD Deploy| TEST1
+    TEST1 -->|Automated Tests Pass| STG1
+    STG1 -->|Manual Approval| PROD1
+    PROD1 -.->|Continuous Sync| DR1
+
+    style DEV1 fill:#e3f2fd
+    style TEST1 fill:#fff9c4
+    style STG1 fill:#ffe0b2
+    style PROD1 fill:#c8e6c9
+    style DR1 fill:#ffcdd2
+                        </div>
+                    </div>
+
+                    <h3>Environment Configurations:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Environment</th>
+                                    <th>Purpose</th>
+                                    <th>Infrastructure</th>
+                                    <th>Data</th>
+                                    <th>Access</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Development</strong></td>
+                                    <td>Local development</td>
+                                    <td>Docker Compose</td>
+                                    <td>Synthetic test data</td>
+                                    <td>All developers</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Testing</strong></td>
+                                    <td>Automated testing (CI/CD)</td>
+                                    <td>K8s (1 node, 2 vCPU, 4GB RAM)</td>
+                                    <td>Test fixtures</td>
+                                    <td>CI/CD pipelines</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Staging</strong></td>
+                                    <td>Pre-production validation</td>
+                                    <td>K8s (3 nodes, 4 vCPU, 8GB RAM each)</td>
+                                    <td>Anonymized prod data</td>
+                                    <td>Dev team, QA, PM</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Production</strong></td>
+                                    <td>Live user traffic</td>
+                                    <td>K8s (10+ nodes, 8 vCPU, 16GB RAM each)</td>
+                                    <td>Real user data</td>
+                                    <td>DevOps, SRE only</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>DR (Disaster Recovery)</strong></td>
+                                    <td>Failover & backup</td>
+                                    <td>K8s (5 nodes, same as prod)</td>
+                                    <td>Replicated prod data</td>
+                                    <td>DevOps lead only</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Deployment Pipeline:</h3>
+                    <pre><code>1. Developer Push → GitHub
+2. GitHub Actions Trigger → Build & Test
+3. Docker Image Build → Push to ECR/GCR
+4. Deploy to Testing → Run E2E Tests
+5. Deploy to Staging → QA Manual Testing
+6. Manual Approval → Deploy to Production
+7. Health Checks → Monitor Metrics
+8. Rollback if Error Rate > 1%</code></pre>
+
+                    <div class="success-box mt-2">
+                        <strong>Infrastructure as Code:</strong>
+                        <ul>
+                            <li><strong>Terraform:</strong> AWS/GCP infrastructure provisioning</li>
+                            <li><strong>Helm Charts:</strong> Kubernetes application deployment</li>
+                            <li><strong>Ansible:</strong> Configuration management</li>
+                            <li><strong>GitOps:</strong> ArgoCD for continuous deployment</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Diagram 17: Performance Optimization Strategy -->
+            <section id="diagram-17" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">17. Performance Optimization Strategy</h2>
+                        <span class="card-badge">Performance</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+graph TB
+    subgraph "Frontend Optimization"
+        FE1[Code Splitting]
+        FE2[Lazy Loading]
+        FE3[Image Optimization - WebP]
+        FE4[CDN - CloudFront]
+        FE5[Browser Caching]
+        FE6[Compression - Gzip/Brotli]
+        FE7[Service Workers - PWA]
+    end
+
+    subgraph "Backend Optimization"
+        BE1[Database Indexing]
+        BE2[Query Optimization]
+        BE3[Connection Pooling]
+        BE4[Async Processing]
+        BE5[Message Queue - RabbitMQ]
+        BE6[Background Jobs]
+    end
+
+    subgraph "Caching Strategy"
+        C1[Redis Cache L1]
+        C2[Application Cache L2]
+        C3[CDN Cache L3]
+        C4[Database Query Cache]
+        C5[HTTP Cache Headers]
+    end
+
+    subgraph "API Optimization"
+        API1[Pagination]
+        API2[Field Selection - GraphQL]
+        API3[Response Compression]
+        API4[Rate Limiting]
+        API5[API Versioning]
+    end
+
+    subgraph "Database Optimization"
+        DB1[Read Replicas - 3x]
+        DB2[Write Master - 1x]
+        DB3[Partitioning]
+        DB4[Archiving Old Data]
+        DB5[Materialized Views]
+    end
+
+    subgraph "Infrastructure Scaling"
+        INF1[Horizontal Pod Autoscaling]
+        INF2[Vertical Scaling]
+        INF3[Load Balancing]
+        INF4[Multi-AZ Deployment]
+        INF5[Auto-scaling Policies]
+    end
+
+    FE1 --> FE7
+    FE7 --> API1
+    
+    API1 --> C1
+    C1 --> BE1
+    
+    BE1 --> DB1
+    DB1 --> DB2
+    
+    INF1 --> INF5
+
+    style C1 fill:#ffeb3b
+    style DB1 fill:#4caf50
+    style INF1 fill:#2196f3
+    style API1 fill:#ff9800
+                        </div>
+                    </div>
+
+                    <h3>Performance Targets & Metrics:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Current</th>
+                                    <th>Target</th>
+                                    <th>Optimization</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Page Load Time (FCP)</strong></td>
+                                    <td>1.8s</td>
+                                    <td>&lt; 1.5s</td>
+                                    <td>Code splitting, lazy loading, CDN</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>API Response Time (p95)</strong></td>
+                                    <td>180ms</td>
+                                    <td>&lt; 200ms</td>
+                                    <td>Redis caching, database indexing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Database Query Time</strong></td>
+                                    <td>45ms</td>
+                                    <td>&lt; 50ms</td>
+                                    <td>Read replicas, query optimization</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Concurrent Users</strong></td>
+                                    <td>12,000</td>
+                                    <td>20,000+</td>
+                                    <td>Horizontal scaling, load balancing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Throughput (TPS)</strong></td>
+                                    <td>1,200</td>
+                                    <td>2,000+</td>
+                                    <td>Connection pooling, async processing</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cache Hit Rate</strong></td>
+                                    <td>82%</td>
+                                    <td>&gt; 90%</td>
+                                    <td>Improve cache invalidation strategy</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Error Rate</strong></td>
+                                    <td>0.05%</td>
+                                    <td>&lt; 0.1%</td>
+                                    <td>Circuit breakers, retry logic</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Caching Strategy Details:</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cache Type</th>
+                                    <th>Data</th>
+                                    <th>TTL</th>
+                                    <th>Invalidation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Redis (L1)</strong></td>
+                                    <td>User sessions, API responses, product catalog</td>
+                                    <td>5-15 min</td>
+                                    <td>On update/delete</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Application (L2)</strong></td>
+                                    <td>Static config, reference data</td>
+                                    <td>1 hour</td>
+                                    <td>Manual refresh</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CDN (L3)</strong></td>
+                                    <td>Static assets (CSS, JS, images)</td>
+                                    <td>7 days</td>
+                                    <td>Cache-Control headers</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Database Query Cache</strong></td>
+                                    <td>Complex aggregation queries</td>
+                                    <td>30 min</td>
+                                    <td>On data change</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Browser Cache</strong></td>
+                                    <td>API responses, images</td>
+                                    <td>5 min</td>
+                                    <td>ETag validation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-rocket"></i>
+                        <strong>Quick Wins Implemented:</strong>
+                        <ul>
+                            <li><strong>Database:</strong> Added indexes on frequently queried columns (30% faster)</li>
+                            <li><strong>API:</strong> Implemented pagination (50% less data transfer)</li>
+                            <li><strong>Frontend:</strong> Code splitting reduced initial bundle by 40%</li>
+                            <li><strong>Caching:</strong> Redis for hot data (85% cache hit rate)</li>
+                            <li><strong>Images:</strong> WebP format + CDN (60% smaller file sizes)</li>
+                            <li><strong>Compression:</strong> Brotli compression (20% smaller than Gzip)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="content-section">
+                <h2>📊 Performance Targets</h2>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Target</th>
+                                <th>Current</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Response Time (p95)</td>
+                                <td>&lt; 200ms</td>
+                                <td>180ms</td>
+                                <td><span class="badge badge-success">✓ Passing</span></td>
+                            </tr>
+                            <tr>
+                                <td>Error Rate</td>
+                                <td>&lt; 0.1%</td>
+                                <td>0.05%</td>
+                                <td><span class="badge badge-success">✓ Passing</span></td>
+                            </tr>
+                            <tr>
+                                <td>System Availability</td>
+                                <td>99.9%</td>
+                                <td>99.95%</td>
+                                <td><span class="badge badge-success">✓ Passing</span></td>
+                            </tr>
+                            <tr>
+                                <td>Supported Users</td>
+                                <td>10,000+</td>
+                                <td>12,000</td>
+                                <td><span class="badge badge-success">✓ Passing</span></td>
+                            </tr>
+                            <tr>
+                                <td>Code Coverage</td>
+                                <td>&gt; 80%</td>
+                                <td>85%</td>
+                                <td><span class="badge badge-success">✓ Passing</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                    © 2025 HealthAI App Documentation | Generated on October 28, 2025
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>

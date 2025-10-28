@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HealthAI App - Tài liệu đặc tả chi tiết cho ứng dụng y tế tích hợp AI">
+    <title>HealthAI App - Documentation</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="index.html" class="nav-link active">Trang chủ</a>
+                    <a href="pages/architecture.html" class="nav-link">Kiến trúc</a>
+                    <a href="pages/functional-flows.html" class="nav-link">Chức năng</a>
+                    <a href="pages/api-docs.html" class="nav-link">API</a>
+                    <a href="pages/database.html" class="nav-link">Database</a>
+                    <a href="pages/quick-start.html" class="nav-link">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Tìm kiếm...">
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Tổng quan</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#overview" class="sidebar-link active">Giới thiệu</a></li>
+                    <li class="sidebar-item"><a href="#features" class="sidebar-link">Tính năng chính</a></li>
+                    <li class="sidebar-item"><a href="#tech-stack" class="sidebar-link">Tech Stack</a></li>
+                    <li class="sidebar-item"><a href="#quick-links" class="sidebar-link">Quick Links</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Tài liệu kỹ thuật</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="pages/architecture.html" class="sidebar-link">Kiến trúc hệ thống</a></li>
+                    <li class="sidebar-item"><a href="pages/functional-flows.html" class="sidebar-link">Luồng chức năng</a></li>
+                    <li class="sidebar-item"><a href="pages/api-docs.html" class="sidebar-link">API Documentation</a></li>
+                    <li class="sidebar-item"><a href="pages/database.html" class="sidebar-link">Database Schema</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Hướng dẫn</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="pages/quick-start.html" class="sidebar-link">Quick Start Guide</a></li>
+                    <li class="sidebar-item"><a href="#deployment" class="sidebar-link">Deployment</a></li>
+                    <li class="sidebar-item"><a href="#testing" class="sidebar-link">Testing</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section id="overview" class="content-section fade-in">
+                <h1 class="page-title">🏥 HealthAI App Documentation</h1>
+                <p class="page-subtitle">
+                    Tài liệu đặc tả chi tiết cho ứng dụng y tế tích hợp AI - Capstone Project
+                </p>
+
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Phiên bản:</strong> 1.0.0 | <strong>Cập nhật:</strong> October 28, 2025
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📖 Giới thiệu dự án</h2>
+                        <span class="card-badge">Enterprise Healthcare System</span>
+                    </div>
+                    
+                    <h3>🏢 Tổng Quan Dự Án</h3>
+                    <p>
+                        <strong>HealthAI App</strong> là một <strong>Hệ thống Y tế Tích hợp Toàn diện</strong> được thiết kế 
+                        dành riêng cho <strong>Tập đoàn Y tế Tư nhân</strong> sở hữu chuỗi bệnh viện và phòng khám.
+                    </p>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-building"></i>
+                        <strong>Đối Tượng Triển Khai:</strong> Tập đoàn Y tế Tư nhân với hệ thống đa bệnh viện
+                    </div>
+
+                    <h3>🎯 Mục Tiêu Dự Án</h3>
+                    <p>
+                        Phát triển một nền tảng số hóa toàn diện cho phép <strong>cư dân/bệnh nhân</strong> của tập đoàn 
+                        có thể truy cập và sử dụng dịch vụ y tế một cách liền mạch từ bất kỳ bệnh viện/phòng khám nào 
+                        trong hệ thống.
+                    </p>
+
+                    <h3>💡 Giải Pháp Cung Cấp</h3>
+                    <ul>
+                        <li><strong>Cho Bệnh Nhân:</strong>
+                            <ul>
+                                <li>Đăng ký/đăng nhập tài khoản thống nhất trên toàn hệ thống</li>
+                                <li>Quản lý hồ sơ sức khỏe điện tử (EHR) tập trung</li>
+                                <li>AI chẩn đoán sơ bộ dựa trên triệu chứng và lịch sử bệnh</li>
+                                <li>Đặt lịch khám tại bất kỳ bệnh viện nào trong chuỗi</li>
+                                <li>Tư vấn từ xa qua video call với bác sĩ</li>
+                                <li>Mua thuốc online từ hệ thống nhà thuốc của tập đoàn</li>
+                                <li>Thanh toán trực tuyến (VNPay, MoMo, ZaloPay)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Cho Bệnh Viện/Phòng Khám:</strong>
+                            <ul>
+                                <li>Quản lý lịch hẹn và bác sĩ</li>
+                                <li>Theo dõi bệnh nhân và kết quả khám</li>
+                                <li>Kê toa thuốc điện tử</li>
+                                <li>Tích hợp với HIS (Hospital Information System)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Cho Tập Đoàn:</strong>
+                            <ul>
+                                <li>Dashboard quản trị tập trung</li>
+                                <li>Báo cáo thống kê doanh thu đa bệnh viện</li>
+                                <li>Quản lý tồn kho thuốc tập trung</li>
+                                <li>Giám sát chất lượng dịch vụ</li>
+                                <li>Phân tích dữ liệu bệnh nhân (Big Data)</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3>🌐 Phạm Vi Triển Khai</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Thành Phần</th>
+                                    <th>Mô Tả</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Multi-Hospital Network</strong></td>
+                                    <td>Hỗ trợ 10-50+ bệnh viện/phòng khám trong cùng tập đoàn</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Unified Patient Portal</strong></td>
+                                    <td>Web App + Mobile App cho bệnh nhân</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doctor Portal</strong></td>
+                                    <td>Web App dành cho bác sĩ và nhân viên y tế</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Admin Dashboard</strong></td>
+                                    <td>Web App quản trị cho Ban Giám Đốc tập đoàn</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Pharmacy Management</strong></td>
+                                    <td>Hệ thống quản lý nhà thuốc và kho</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>AI Diagnosis Engine</strong></td>
+                                    <td>Công cụ AI hỗ trợ chẩn đoán sơ bộ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>🔑 Lợi Ích Chính</h3>
+                    <div class="grid grid-2">
+                        <div class="success-box">
+                            <strong>Cho Bệnh Nhân:</strong>
+                            <ul>
+                                <li>Truy cập dịch vụ y tế mọi lúc, mọi nơi</li>
+                                <li>Hồ sơ sức khỏe điện tử đồng bộ</li>
+                                <li>Tiết kiệm thời gian đi lại</li>
+                                <li>Tư vấn nhanh qua AI & video call</li>
+                            </ul>
+                        </div>
+                        <div class="success-box">
+                            <strong>Cho Tập Đoàn:</strong>
+                            <ul>
+                                <li>Tăng số lượng bệnh nhân</li>
+                                <li>Tối ưu hóa vận hành</li>
+                                <li>Giảm chi phí quản lý</li>
+                                <li>Nâng cao chất lượng dịch vụ</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-2">
+                        <i class="fas fa-chart-line"></i>
+                        <strong>Target Users:</strong> 100,000+ bệnh nhân | 500+ bác sĩ | 50+ cơ sở y tế
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="content-section">
+                <h2>✨ Tính năng chính</h2>
+                
+                <div class="grid grid-3">
+                    <div class="card">
+                        <h3>🔐 Xác thực người dùng</h3>
+                        <ul>
+                            <li>Đăng ký với xác thực OTP SMS</li>
+                            <li>Đăng nhập an toàn với JWT</li>
+                            <li>Quản lý session & refresh tokens</li>
+                            <li>2FA & audit logs</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>🤖 AI Diagnosis</h3>
+                        <ul>
+                            <li>Chatbot phân tích triệu chứng</li>
+                            <li>Chẩn đoán sơ bộ thông minh</li>
+                            <li>Đánh giá mức độ nguy hiểm</li>
+                            <li>Gợi ý điều trị phù hợp</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>📅 Đặt lịch khám</h3>
+                        <ul>
+                            <li>Tìm bác sĩ theo chuyên khoa</li>
+                            <li>Đặt lịch hẹn trực tuyến</li>
+                            <li>Video call với bác sĩ</li>
+                            <li>Nhận toa thuốc điện tử</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>💊 Cửa hàng thuốc</h3>
+                        <ul>
+                            <li>Mua thuốc OTC online</li>
+                            <li>Tư vấn dược sĩ qua video</li>
+                            <li>Quản lý đơn hàng & giao hàng</li>
+                            <li>Theo dõi tồn kho</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>💳 Thanh toán</h3>
+                        <ul>
+                            <li>Tích hợp VNPAY</li>
+                            <li>QR Code & thẻ ngân hàng</li>
+                            <li>Ví điện tử</li>
+                            <li>Lịch sử giao dịch</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <h3>📊 Admin Dashboard</h3>
+                        <ul>
+                            <li>Quản lý người dùng</li>
+                            <li>Giám sát AI & logs</li>
+                            <li>Báo cáo thống kê</li>
+                            <li>Quản lý sản phẩm & toa thuốc</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tech Stack Section -->
+            <section id="tech-stack" class="content-section">
+                <h2>🛠️ Tech Stack</h2>
+                
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3>Frontend</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Technology</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge badge-primary">React Native</span></td>
+                                        <td>Cross-platform Mobile App (iOS/Android)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-primary">React 18</span></td>
+                                        <td>Web Application (Patient & Admin Portal)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-primary">TypeScript</span></td>
+                                        <td>Type-safe JavaScript development</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-primary">Redux Toolkit</span></td>
+                                        <td>State Management</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-primary">React Navigation</span></td>
+                                        <td>Mobile app routing & navigation</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-info">Redux</span></td>
+                                        <td>State Management</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Backend</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Technology</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge badge-success">Spring Boot</span></td>
+                                        <td>9 Microservices (Auth, User, AI, etc.)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-success">Python</span></td>
+                                        <td>AI Service (ML Models)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-warning">Spring Cloud Gateway</span></td>
+                                        <td>API Gateway & Load Balancer</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-warning">Spring Security</span></td>
+                                        <td>Authentication & Authorization</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Database & Cache</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Technology</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge badge-primary">PostgreSQL</span></td>
+                                        <td>Main Relational Database</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-success">MongoDB</span></td>
+                                        <td>Logs & Analytics (NoSQL)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-danger">Redis</span></td>
+                                        <td>Session Cache & Rate Limiting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-warning">Elasticsearch</span></td>
+                                        <td>Full-text Search</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>External Services</h3>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="badge badge-info">OpenAI API</span></td>
+                                        <td>AI Diagnosis (GPT-4)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-warning">VNPAY</span></td>
+                                        <td>Payment Gateway</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-success">Twilio</span></td>
+                                        <td>SMS & Voice (OTP)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-danger">Firebase</span></td>
+                                        <td>Push Notifications</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="badge badge-primary">Google Maps</span></td>
+                                        <td>Geolocation & Hospital Finding</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Links Section -->
+            <section id="quick-links" class="content-section">
+                <h2>🚀 Quick Links</h2>
+                
+                <div class="grid grid-2">
+                    <a href="pages/architecture.html" class="card" style="text-decoration: none;">
+                        <h3>📐 Kiến trúc hệ thống</h3>
+                        <p>16 sơ đồ Mermaid chi tiết về kiến trúc, microservices, deployment, security, và performance</p>
+                        <span class="btn btn-primary">
+                            Xem chi tiết <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="pages/functional-flows.html" class="card" style="text-decoration: none;">
+                        <h3>🔄 Luồng chức năng</h3>
+                        <p>Chi tiết từng bước của Authentication, AI Diagnosis, Appointment, Payment với sequence diagrams</p>
+                        <span class="btn btn-primary">
+                            Xem chi tiết <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="pages/api-docs.html" class="card" style="text-decoration: none;">
+                        <h3>📡 API Documentation</h3>
+                        <p>Tất cả API endpoints với request/response examples, authentication, và error handling</p>
+                        <span class="btn btn-primary">
+                            Xem chi tiết <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="pages/database.html" class="card" style="text-decoration: none;">
+                        <h3>💾 Database Schema</h3>
+                        <p>10 tables với ER diagram, relationships, indexes, và data types chi tiết</p>
+                        <span class="btn btn-primary">
+                            Xem chi tiết <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <a href="pages/quick-start.html" class="card" style="text-decoration: none;">
+                        <h3>⚡ Quick Start Guide</h3>
+                        <p>Hướng dẫn setup môi trường, cài đặt dependencies, và chạy project trong 15 phút</p>
+                        <span class="btn btn-primary">
+                            Bắt đầu <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </a>
+
+                    <div class="card">
+                        <h3>📥 Download Resources</h3>
+                        <p>Tải các file tài liệu gốc và diagrams</p>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <a href="../dacta.md" class="btn btn-secondary" download>
+                                <i class="fas fa-download"></i> Đặc tả
+                            </a>
+                            <a href="../SYSTEM_ARCHITECTURE_DIAGRAMS.md" class="btn btn-secondary" download>
+                                <i class="fas fa-download"></i> Diagrams
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics Section -->
+            <section class="content-section">
+                <h2>📊 Thống kê dự án</h2>
+                
+                <div class="grid grid-4">
+                    <div class="card text-center">
+                        <h1 style="color: var(--primary-color); margin-bottom: 0.5rem;">9</h1>
+                        <p style="margin: 0;"><strong>Microservices</strong></p>
+                    </div>
+
+                    <div class="card text-center">
+                        <h1 style="color: var(--accent-color); margin-bottom: 0.5rem;">16</h1>
+                        <p style="margin: 0;"><strong>Mermaid Diagrams</strong></p>
+                    </div>
+
+                    <div class="card text-center">
+                        <h1 style="color: var(--warning-color); margin-bottom: 0.5rem;">10</h1>
+                        <p style="margin: 0;"><strong>Database Tables</strong></p>
+                    </div>
+
+                    <div class="card text-center">
+                        <h1 style="color: var(--danger-color); margin-bottom: 0.5rem;">50+</h1>
+                        <p style="margin: 0;"><strong>API Endpoints</strong></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">
+                    © 2025 HealthAI App - Capstone Project Documentation | 
+                    Made with <i class="fas fa-heart" style="color: var(--danger-color);"></i> by Team
+                </p>
+                <div>
+                    <a href="https://github.com" target="_blank" style="margin-left: 1rem;">
+                        <i class="fab fa-github" style="font-size: 1.5rem;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

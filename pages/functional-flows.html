@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Functional Flows - HealthAI App</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏥</span>
+                    <span>HealthAI App Documentation</span>
+                </div>
+                <nav class="nav-main">
+                    <a href="../index.html" class="nav-link">Trang chủ</a>
+                    <a href="architecture.html" class="nav-link">Kiến trúc</a>
+                    <a href="functional-flows.html" class="nav-link active">Chức năng</a>
+                    <a href="api-docs.html" class="nav-link">API</a>
+                    <a href="database.html" class="nav-link">Database</a>
+                    <a href="quick-start.html" class="nav-link">Quick Start</a>
+                    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Flows</h3>
+                <ul class="sidebar-list">
+                    <li class="sidebar-item"><a href="#registration" class="sidebar-link">Registration Flow</a></li>
+                    <li class="sidebar-item"><a href="#login" class="sidebar-link">Login Flow</a></li>
+                    <li class="sidebar-item"><a href="#ai-diagnosis" class="sidebar-link">AI Diagnosis</a></li>
+                    <li class="sidebar-item"><a href="#appointment" class="sidebar-link">Appointment Booking</a></li>
+                    <li class="sidebar-item"><a href="#payment" class="sidebar-link">Payment Process</a></li>
+                    <li class="sidebar-item"><a href="#chat" class="sidebar-link">Chat & Video Call</a></li>
+                    <li class="sidebar-item"><a href="#pharmacy" class="sidebar-link">Pharmacy Order</a></li>
+                    <li class="sidebar-item"><a href="#inventory" class="sidebar-link">Inventory Management</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <section class="content-section fade-in">
+                <h1 class="page-title">🔄 Luồng chức năng chi tiết</h1>
+                <p class="page-subtitle">Chi tiết từng bước của các chức năng chính</p>
+            </section>
+
+            <!-- Registration Flow -->
+            <section id="registration" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">1. User Registration Flow (9 Steps)</h2>
+                        <span class="card-badge">Authentication</span>
+                    </div>
+
+                    <h3>Sequence Diagram</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as 👤 User
+    participant FE as 📱 Frontend
+    participant API as 🚪 API Gateway
+    participant Auth as 🔐 Auth Service
+    participant Redis as ⚡ Redis
+    participant SMS as 📞 Twilio
+    participant DB as 🐘 PostgreSQL
+    
+    U->>FE: 1. Enter registration info
+    FE->>FE: 2. Validate input (email, phone, password)
+    FE->>API: 3. POST /auth/register
+    API->>Auth: 4. Forward request
+    
+    Auth->>DB: 5. Check email/phone exists
+    alt Email/Phone exists
+        DB-->>Auth: User found
+        Auth-->>FE: 409 Conflict
+        FE-->>U: ❌ Email/Phone already registered
+    else New user
+        DB-->>Auth: Not found
+        Auth->>Auth: 6. Generate 6-digit OTP
+        Auth->>Redis: 7. Store OTP (TTL: 5min)
+        Auth->>SMS: 8. Send OTP via Twilio
+        SMS-->>U: 📱 SMS: Your OTP is 123456
+        Auth-->>FE: 200 OK with otpToken
+        FE-->>U: ✉️ OTP sent! Enter code
+        
+        U->>FE: 9. Enter OTP code
+        FE->>API: POST /auth/otp/verify
+        API->>Auth: Forward
+        Auth->>Redis: Check OTP valid
+        
+        alt OTP valid
+            Redis-->>Auth: ✓ Valid
+            Auth->>DB: Create user account
+            Auth->>Auth: Generate JWT tokens
+            Auth-->>FE: 200 OK with tokens
+            FE-->>U: 🎉 Registration successful!
+        else OTP invalid
+            Redis-->>Auth: ❌ Invalid/Expired
+            Auth-->>FE: 400 Bad Request
+            FE-->>U: ❌ Invalid OTP. Try again
+        end
+    end
+                        </div>
+                    </div>
+
+                    <h3>Step-by-Step Details</h3>
+                    
+                    <h4>Step 1: User Input (Frontend)</h4>
+                    <ul>
+                        <li><strong>Email:</strong> Regex validation <code>^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$</code></li>
+                        <li><strong>Phone:</strong> Vietnam format <code>^(\+84|0)[0-9]{9,10}$</code></li>
+                        <li><strong>Password:</strong> Min 8 chars, uppercase, lowercase, digit, special char</li>
+                        <li><strong>Full Name:</strong> Min 2 chars</li>
+                        <li><strong>Date of Birth:</strong> Must be 18+ years old</li>
+                    </ul>
+
+                    <h4>Step 2: Backend Validation</h4>
+                    <pre><code>// Check email exists
+SELECT COUNT(*) FROM users WHERE email = ?
+// Check phone exists
+SELECT COUNT(*) FROM users WHERE phone = ?
+// If exists: Return 409 Conflict</code></pre>
+
+                    <h4>Step 3: Generate & Send OTP</h4>
+                    <ul>
+                        <li>Generate random 6-digit code: <code>Math.floor(100000 + Math.random() * 900000)</code></li>
+                        <li>Store in Redis with 5-minute TTL</li>
+                        <li>Send via Twilio SMS API</li>
+                        <li>Max 3 attempts allowed</li>
+                    </ul>
+
+                    <h4>Step 4: OTP Verification</h4>
+                    <ul>
+                        <li>User enters OTP within 5 minutes</li>
+                        <li>Backend checks Redis for valid OTP</li>
+                        <li>If valid: Create user account, generate JWT tokens</li>
+                        <li>If invalid: Return error, allow retry (max 3 times)</li>
+                    </ul>
+
+                    <h4>Step 5: Account Creation</h4>
+                    <pre><code>INSERT INTO users (email, phone, password_hash, full_name, dob, is_verified)
+VALUES (?, ?, bcrypt_hash(?), ?, ?, true);
+
+INSERT INTO user_profiles (user_id, full_name, dob, address)
+VALUES (?, ?, ?, ?);</code></pre>
+
+                    <h4>Security Measures</h4>
+                    <ul>
+                        <li>✅ Password hashed with bcrypt (salt rounds: 10+)</li>
+                        <li>✅ OTP stored in Redis (auto-expire)</li>
+                        <li>✅ Rate limiting: 5 attempts per 30 minutes</li>
+                        <li>✅ HTTPS/TLS encryption</li>
+                        <li>✅ Audit log for registration events</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Login Flow -->
+            <section id="login" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">2. Login Flow (10 Steps)</h2>
+                        <span class="card-badge">Authentication</span>
+                    </div>
+
+                    <h3>Sequence Diagram</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as 👤 User
+    participant FE as 📱 Frontend
+    participant Auth as 🔐 Auth Service
+    participant DB as 🐘 PostgreSQL
+    participant Redis as ⚡ Redis
+    
+    U->>FE: 1. Enter email/phone + password
+    FE->>FE: 2. Validate input format
+    FE->>Auth: 3. POST /auth/login
+    
+    Auth->>DB: 4. Find user by email/phone
+    alt User not found
+        DB-->>Auth: Not found
+        Auth-->>FE: 401 Unauthorized
+        FE-->>U: ❌ Invalid credentials
+    else User found
+        DB-->>Auth: User data
+        Auth->>Auth: 5. Verify password (bcrypt)
+        
+        alt Password correct
+            Auth->>DB: 6. Check account status
+            alt Account active
+                Auth->>Auth: 7. Generate JWT tokens
+                Auth->>Redis: 8. Create session
+                Auth->>DB: 9. Update last_login
+                Auth-->>FE: 200 OK with tokens
+                FE->>FE: 10. Store tokens
+                FE-->>U: ✓ Login successful!
+            else Account inactive
+                Auth-->>FE: 403 Forbidden
+                FE-->>U: ❌ Account disabled
+            end
+        else Password incorrect
+            Auth->>DB: Increment failed_attempts
+            Auth-->>FE: 401 Unauthorized
+            FE-->>U: ❌ Invalid credentials
+        end
+    end
+                        </div>
+                    </div>
+
+                    <h3>Login Features</h3>
+                    <ul>
+                        <li><strong>Brute Force Protection:</strong> Lock account after 5 failed attempts (30 min)</li>
+                        <li><strong>Session Management:</strong> Store active sessions in Redis</li>
+                        <li><strong>Token Refresh:</strong> Auto-refresh before expiry</li>
+                        <li><strong>Device Tracking:</strong> Track login devices & locations</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- AI Diagnosis Flow -->
+            <section id="ai-diagnosis" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">3. AI Diagnosis Flow (13 Steps)</h2>
+                        <span class="card-badge">AI/ML</span>
+                    </div>
+
+                    <h3>Sequence Diagram</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as 🏥 Patient
+    participant FE as 📱 App
+    participant AI as 🤖 AI Service
+    participant OpenAI as 🧠 OpenAI API
+    participant DB as 🐘 PostgreSQL
+    participant Mongo as 🍃 MongoDB
+    
+    U->>FE: 1. Input symptoms & vital signs
+    FE->>FE: 2. Validate input
+    FE->>AI: 3. POST /ai/chat
+    
+    AI->>DB: 4. Get patient medical history
+    DB-->>AI: History data
+    
+    AI->>AI: 5. Build AI prompt
+    AI->>OpenAI: 6. Send to GPT-4
+    OpenAI->>OpenAI: 7. Process symptoms
+    OpenAI-->>AI: 8. Diagnosis result
+    
+    AI->>AI: 9. Calculate risk level
+    AI->>AI: 10. Generate recommendations
+    
+    alt High Risk
+        AI->>AI: 11. Flag as urgent
+        AI->>DB: 12. Create emergency alert
+        AI-->>FE: ⚠️ URGENT: Go to hospital
+    else Medium Risk
+        AI-->>FE: 📋 Recommend doctor consultation
+    else Low Risk
+        AI-->>FE: ✓ Self-care recommendations
+    end
+    
+    AI->>DB: 13. Save diagnosis record
+    AI->>Mongo: Log AI interaction
+    FE-->>U: Display results
+                        </div>
+                    </div>
+
+                    <h3>Risk Assessment Logic</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Risk Level</th>
+                                    <th>Criteria</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-success">LOW</span></td>
+                                    <td>Common symptoms, stable vitals</td>
+                                    <td>Self-care tips, OTC drugs</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-warning">MEDIUM</span></td>
+                                    <td>Persistent symptoms, moderate severity</td>
+                                    <td>Book doctor appointment within 24-48h</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-danger">HIGH</span></td>
+                                    <td>Severe symptoms, critical vitals</td>
+                                    <td>Emergency! Go to hospital immediately</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>AI Prompt Template</h3>
+                    <pre><code>You are a medical AI assistant. Analyze the following patient data:
+
+Patient Info:
+- Age: {age}, Gender: {gender}
+- Medical History: {history}
+
+Current Symptoms:
+- {symptoms}
+- Duration: {duration}
+- Severity: {severity}
+
+Vital Signs:
+- Heart Rate: {heartRate} bpm
+- Blood Pressure: {bloodPressure}
+- Temperature: {temperature}°C
+
+Provide:
+1. Top 5 possible diagnoses with probability
+2. Risk level assessment (Low/Medium/High)
+3. Recommended next steps
+4. When to seek emergency care</code></pre>
+                </div>
+            </section>
+
+            <!-- Appointment Booking Flow -->
+            <section id="appointment" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">4. Appointment Booking Flow (12 Steps)</h2>
+                        <span class="card-badge">Healthcare</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as User App
+    participant AS as Appointment Service
+    participant DS as Doctor Service
+    participant NS as Notification Service
+    participant PS as Payment Service
+    participant VNPAY as VNPay Gateway
+    participant DB as Database
+
+    Note over U,DB: 🔍 Doctor Search
+    U->>AS: 1. GET /appointments/doctors<br/>?specialty=Cardiology&city=HCMC
+    AS->>DS: 2. Query doctors by specialty
+    DS->>DB: 3. SELECT FROM doctors WHERE...
+    DB-->>DS: Doctor list
+    DS-->>AS: {doctors: [name, specialty, rating, availableSlots]}
+    AS-->>U: Display doctor list with availability
+
+    Note over U,DB: 📅 Check Available Slots
+    U->>AS: 4. GET /appointments/doctors/{doctorId}/slots<br/>?date=2025-10-30
+    AS->>DB: 5. Query available time slots
+    DB-->>AS: {slots: ["09:00", "10:00", "14:00", "15:00"]}
+    AS-->>U: Show available time slots
+
+    Note over U,DB: 📝 Book Appointment
+    U->>AS: 6. POST /appointments/book<br/>{doctorId, date, time, reason}
+    AS->>DB: 7. Check slot still available
+    DB-->>AS: Available: true
+    AS->>DB: 8. Lock slot (status: PENDING_PAYMENT)
+    AS->>DB: 9. INSERT INTO appointments
+    DB-->>AS: appointmentId
+
+    Note over U,DB: 💰 Payment for Appointment Fee
+    AS->>PS: 10. Create payment<br/>{appointmentId, amount: 200000}
+    PS->>VNPAY: 11. Create payment URL
+    VNPAY-->>PS: paymentUrl
+    PS->>DB: 12. INSERT INTO payment_transactions (PENDING)
+    PS-->>AS: paymentUrl
+    AS-->>U: {appointmentId, paymentUrl, expiresIn: 900}
+
+    U->>VNPAY: 13. Open payment in browser
+    Note over U,VNPAY: User enters card info
+    VNPAY->>PS: 14. IPN callback (payment result)
+    PS->>DB: 15. UPDATE payment_transactions (SUCCESS)
+    
+    alt Payment Success
+        PS->>AS: Payment confirmed
+        AS->>DB: 16. UPDATE appointments SET status = 'CONFIRMED'
+        AS->>NS: 17. Send notifications
+        NS->>U: Push: "Đặt lịch thành công!"
+        NS->>Doctor: Email: "Lịch hẹn mới từ bệnh nhân"
+        AS-->>U: {status: "CONFIRMED", appointmentDetails}
+    else Payment Failed
+        PS->>AS: Payment failed
+        AS->>DB: UPDATE appointments SET status = 'CANCELLED'
+        AS->>DB: Release time slot
+        AS->>NS: Send failure notification
+        NS->>U: "Thanh toán thất bại, vui lòng thử lại"
+    end
+
+    Note over U,DB: 📧 Confirmation & Reminders
+    NS->>U: 18. Email confirmation with details
+    NS->>U: 19. SMS reminder (24h before)
+    NS->>U: 20. Push notification (1h before)
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <h3>📋 Booking Steps (20 Steps)</h3>
+                        <ol>
+                            <li><strong>Search Doctors:</strong> Filter by specialty, location, rating, availability</li>
+                            <li><strong>View Doctor Profile:</strong> Experience, education, reviews, consultation fee</li>
+                            <li><strong>Check Availability:</strong> Real-time available time slots</li>
+                            <li><strong>Select Date & Time:</strong> Choose preferred appointment slot</li>
+                            <li><strong>Enter Reason:</strong> Brief description of health issue</li>
+                            <li><strong>Lock Slot:</strong> Temporary reservation (15 minutes)</li>
+                            <li><strong>Create Appointment:</strong> Generate appointment record (PENDING_PAYMENT)</li>
+                            <li><strong>Generate Payment:</strong> Create payment transaction</li>
+                            <li><strong>Payment Gateway:</strong> Redirect to VNPay</li>
+                            <li><strong>User Payment:</strong> Enter payment details</li>
+                            <li><strong>Verify Payment:</strong> VNPay IPN callback</li>
+                            <li><strong>Update Status:</strong> CONFIRMED or CANCELLED based on payment</li>
+                            <li><strong>Release Slot:</strong> If payment fails, unlock the time slot</li>
+                            <li><strong>Send Confirmation:</strong> Email/SMS with appointment details</li>
+                            <li><strong>Add to Calendar:</strong> Generate .ics file for user</li>
+                            <li><strong>24h Reminder:</strong> SMS reminder sent</li>
+                            <li><strong>1h Reminder:</strong> Push notification</li>
+                            <li><strong>Doctor Notification:</strong> Notify doctor about new appointment</li>
+                            <li><strong>Allow Reschedule:</strong> User can reschedule up to 24h before</li>
+                            <li><strong>Allow Cancellation:</strong> Cancel with refund (if > 24h before)</li>
+                        </ol>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Features:</strong>
+                        <ul>
+                            <li><strong>Real-time Slots:</strong> Live availability checking</li>
+                            <li><strong>Slot Locking:</strong> 15-minute reservation during payment</li>
+                            <li><strong>Multiple Specialties:</strong> 20+ medical specialties</li>
+                            <li><strong>Consultation Fee:</strong> 150,000 - 500,000 VNĐ</li>
+                            <li><strong>Flexible Scheduling:</strong> Book up to 30 days in advance</li>
+                            <li><strong>Reminders:</strong> SMS (24h) + Push (1h) before appointment</li>
+                            <li><strong>Reschedule:</strong> Free reschedule if > 24h before</li>
+                            <li><strong>Refund Policy:</strong> 100% refund if cancelled > 24h before</li>
+                        </ul>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <caption>Appointment Status Flow</caption>
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Actions Available</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-warning">PENDING_PAYMENT</span></td>
+                                    <td>Slot locked, awaiting payment</td>
+                                    <td>Complete payment within 15 min</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-success">CONFIRMED</span></td>
+                                    <td>Payment successful, appointment confirmed</td>
+                                    <td>Reschedule, Cancel (with conditions)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">IN_PROGRESS</span></td>
+                                    <td>Consultation ongoing</td>
+                                    <td>View, Chat with doctor</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">COMPLETED</span></td>
+                                    <td>Consultation finished</td>
+                                    <td>View prescription, Download report, Review</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-danger">CANCELLED</span></td>
+                                    <td>Cancelled by user or payment failed</td>
+                                    <td>Rebook</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-secondary">NO_SHOW</span></td>
+                                    <td>User didn't show up</td>
+                                    <td>No refund</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Process Flow -->
+            <section id="payment" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">5. Payment Processing Flow (10 Steps)</h2>
+                        <span class="card-badge">FinTech</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as User App
+    participant PS as Payment Service
+    participant VNPAY as VNPay Gateway
+    participant MOMO as MoMo Gateway
+    participant DB as Database
+    participant OS as Order Service
+    participant NS as Notification Service
+
+    Note over U,NS: 💳 Payment Initiation
+    U->>PS: 1. POST /payments/vnpay/create<br/>{orderId, amount, orderInfo}
+    PS->>DB: 2. Validate order & amount
+    DB-->>PS: Order valid
+    PS->>DB: 3. CREATE payment_transaction<br/>(status: PENDING, method: VNPAY)
+    DB-->>PS: transactionId
+
+    Note over U,NS: 🔐 Generate Payment URL
+    PS->>VNPAY: 4. Create payment URL<br/>{amount, orderInfo, returnUrl, ipnUrl}
+    PS->>PS: 5. Generate secure hash (HMAC SHA512)
+    VNPAY-->>PS: {paymentUrl, expireTime}
+    PS->>DB: 6. Save payment URL & expire time
+    PS-->>U: {transactionId, paymentUrl, expiresIn: 900}
+
+    Note over U,NS: 🌐 User Payment on Gateway
+    U->>VNPAY: 7. Open payment URL in browser
+    Note over U,VNPAY: User selects payment method:<br/>- ATM card<br/>- Credit card<br/>- QR code
+    Note over U,VNPAY: User enters payment details
+    VNPAY->>VNPAY: 8. Process payment
+    
+    Note over U,NS: 🔔 Payment Callback (IPN)
+    VNPAY->>PS: 9. IPN Callback<br/>{transactionId, status, amount, responseCode}
+    PS->>PS: 10. Verify secure hash
+    PS->>DB: 11. UPDATE payment_transactions<br/>(status: SUCCESS/FAILED)
+    
+    alt Payment Success (responseCode = 00)
+        PS->>OS: 12. Notify order service
+        OS->>DB: UPDATE orders SET payment_status = 'PAID'
+        OS->>DB: UPDATE orders SET status = 'PROCESSING'
+        PS->>NS: 13. Send success notification
+        NS->>U: Push: "Thanh toán thành công!"
+        NS->>U: Email: Payment receipt
+        PS-->>VNPAY: {RspCode: "00", Message: "Confirm Success"}
+    else Payment Failed
+        PS->>OS: Notify payment failed
+        OS->>DB: UPDATE orders SET payment_status = 'FAILED'
+        PS->>NS: Send failure notification
+        NS->>U: "Thanh toán thất bại. Mã lỗi: {responseCode}"
+        PS-->>VNPAY: {RspCode: "00", Message: "Confirm Success"}
+    end
+
+    Note over U,NS: 🔄 User Return URL
+    VNPAY->>U: 14. Redirect to returnUrl<br/>?transactionId=xxx&status=success
+    U->>PS: 15. GET /payments/{transactionId}/status
+    PS->>DB: Query transaction status
+    DB-->>PS: {status, amount, completedAt}
+    PS-->>U: Display payment result
+
+    Note over U,NS: 📊 Payment History
+    U->>PS: 16. GET /payments/history?page=1&limit=20
+    PS->>DB: Query user's transactions
+    DB-->>PS: Transaction list
+    PS-->>U: {total, transactions: [...]}
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <h3>📋 Payment Steps (16 Steps)</h3>
+                        <ol>
+                            <li><strong>Initiate Payment:</strong> User clicks "Thanh toán" button</li>
+                            <li><strong>Validate Order:</strong> Check order exists and amount is correct</li>
+                            <li><strong>Create Transaction:</strong> Generate payment transaction record (PENDING)</li>
+                            <li><strong>Select Gateway:</strong> VNPay, MoMo, or ZaloPay</li>
+                            <li><strong>Generate URL:</strong> Create secure payment URL with HMAC hash</li>
+                            <li><strong>Redirect User:</strong> Open payment gateway in browser/webview</li>
+                            <li><strong>Choose Method:</strong> ATM card, credit card, QR code, e-wallet</li>
+                            <li><strong>Enter Details:</strong> Card number, expiry, CVV, or scan QR</li>
+                            <li><strong>Process Payment:</strong> Gateway processes transaction</li>
+                            <li><strong>IPN Callback:</strong> Gateway sends result to our server</li>
+                            <li><strong>Verify Hash:</strong> Validate secure signature from gateway</li>
+                            <li><strong>Update Status:</strong> Mark transaction as SUCCESS or FAILED</li>
+                            <li><strong>Update Order:</strong> Change order status to PROCESSING (if success)</li>
+                            <li><strong>Send Notification:</strong> Push + Email notification to user</li>
+                            <li><strong>Return to App:</strong> Redirect user back to app with result</li>
+                            <li><strong>Display Result:</strong> Show success/failure page with details</li>
+                        </ol>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <caption>Payment Methods Supported</caption>
+                            <thead>
+                                <tr>
+                                    <th>Gateway</th>
+                                    <th>Methods</th>
+                                    <th>Fee</th>
+                                    <th>Processing Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>VNPay</strong></td>
+                                    <td>ATM, Credit Card, QR Code</td>
+                                    <td>1.5% - 2.5%</td>
+                                    <td>Instant</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MoMo</strong></td>
+                                    <td>E-wallet, Linked Card</td>
+                                    <td>2%</td>
+                                    <td>Instant</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ZaloPay</strong></td>
+                                    <td>E-wallet, ATM</td>
+                                    <td>2%</td>
+                                    <td>Instant</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>COD</strong></td>
+                                    <td>Cash on Delivery</td>
+                                    <td>Free</td>
+                                    <td>At delivery</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Important Security Notes:</strong>
+                        <ul>
+                            <li><strong>Hash Verification:</strong> Always verify secure hash (HMAC SHA512) from gateway</li>
+                            <li><strong>IPN vs Return URL:</strong> Trust IPN callback, not return URL (user can manipulate)</li>
+                            <li><strong>Idempotency:</strong> Handle duplicate IPN callbacks gracefully</li>
+                            <li><strong>Timeout:</strong> Payment URL expires after 15 minutes</li>
+                            <li><strong>Amount Validation:</strong> Always verify amount matches order total</li>
+                            <li><strong>Response Code:</strong> Check responseCode (00 = success)</li>
+                            <li><strong>TLS:</strong> All payment communications use TLS 1.2+</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Response Codes (VNPay):</strong>
+                        <ul>
+                            <li><strong>00:</strong> Success - Giao dịch thành công</li>
+                            <li><strong>07:</strong> Trừ tiền thành công nhưng giao dịch bị nghi ngờ (liên hệ VNPAY)</li>
+                            <li><strong>09:</strong> Thẻ chưa đăng ký Internet Banking</li>
+                            <li><strong>10:</strong> Thẻ hết hạn / Thẻ bị khóa</li>
+                            <li><strong>11:</strong> Thẻ hết hạn</li>
+                            <li><strong>12:</strong> Thẻ bị khóa</li>
+                            <li><strong>13:</strong> Sai mật khẩu xác thực giao dịch (OTP)</li>
+                            <li><strong>24:</strong> User hủy giao dịch</li>
+                            <li><strong>51:</strong> Tài khoản không đủ số dư</li>
+                            <li><strong>65:</strong> Tài khoản vượt quá hạn mức giao dịch trong ngày</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="content-section">
+                <div class="card">
+                    <h2>⚡ Performance Targets</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Flow</th>
+                                    <th>Response Time</th>
+                                    <th>Success Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Registration</td>
+                                    <td>&lt; 3 seconds</td>
+                                    <td>99.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>Login</td>
+                                    <td>&lt; 1 second</td>
+                                    <td>99.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>AI Diagnosis</td>
+                                    <td>&lt; 5 seconds</td>
+                                    <td>98%</td>
+                                </tr>
+                                <tr>
+                                    <td>Appointment Booking</td>
+                                    <td>&lt; 2 seconds</td>
+                                    <td>99.5%</td>
+                                </tr>
+                                <tr>
+                                    <td>Payment</td>
+                                    <td>&lt; 3 seconds</td>
+                                    <td>99%</td>
+                                </tr>
+                                <tr>
+                                    <td>Chat Message</td>
+                                    <td>&lt; 0.1 seconds</td>
+                                    <td>99.9%</td>
+                                </tr>
+                                <tr>
+                                    <td>Video Call Setup</td>
+                                    <td>&lt; 2 seconds</td>
+                                    <td>98%</td>
+                                </tr>
+                                <tr>
+                                    <td>Pharmacy Order</td>
+                                    <td>&lt; 2 seconds</td>
+                                    <td>99.5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat & Video Call Flow -->
+            <section id="chat" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">6. Chat & Video Call Flow</h2>
+                        <span class="card-badge">Telemedicine</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant P as Patient App
+    participant WS as WebSocket Server
+    participant CS as Chat Service
+    participant NS as Notification Service
+    participant D as Doctor App
+    participant VS as Video Service
+    participant DB as Database
+
+    Note over P,D: 📱 Chat Initiation
+    P->>CS: 1. POST /chat/conversations/create<br/>{doctorId, initialMessage}
+    CS->>DB: 2. Create conversation
+    DB-->>CS: conversationId
+    CS->>WS: 3. Notify doctor online
+    WS->>NS: 4. Send push notification
+    NS->>D: "Tin nhắn mới từ bệnh nhân"
+    CS-->>P: conversationId + status
+
+    Note over P,D: 💬 Real-time Messaging
+    P->>WS: 5. Connect WebSocket<br/>ws://api/chat?token=xxx
+    WS-->>P: Connection established
+    D->>WS: 6. Connect WebSocket
+    WS-->>D: Connection established
+    
+    P->>WS: 7. send_message event<br/>{conversationId, content}
+    WS->>CS: 8. Process & save message
+    CS->>DB: 9. INSERT INTO chat_messages
+    DB-->>CS: messageId
+    CS->>WS: 10. Broadcast to doctor
+    WS->>D: message_received event
+    D->>P: 11. Display message
+    
+    D->>WS: 12. typing_start event
+    WS->>P: Show "Bác sĩ đang gõ..."
+    D->>WS: 13. send_message (reply)
+    WS->>CS: Process & save
+    CS->>WS: Broadcast
+    WS->>P: message_received
+
+    Note over P,D: 📎 File Sharing
+    P->>CS: 14. POST /chat/messages/upload<br/>(multipart: file)
+    CS->>S3: 15. Upload to S3
+    S3-->>CS: fileUrl
+    CS->>DB: 16. Save message with fileUrl
+    CS->>WS: 17. Broadcast file message
+    WS->>D: Receive file notification
+    D->>S3: 18. Download file
+
+    Note over P,D: 📞 Video Call Initiation
+    D->>VS: 19. POST /video-call/create-room<br/>{appointmentId}
+    VS->>DB: 20. Create video_call_rooms
+    VS->>Jitsi: 21. Initialize room
+    Jitsi-->>VS: roomCredentials
+    VS-->>D: roomId + hostToken
+    
+    D->>WS: 22. Send call invitation
+    WS->>NS: 23. Push notification
+    NS->>P: "Bác sĩ đang gọi video..."
+    P->>VS: 24. GET /video-call/rooms/{id}/token
+    VS-->>P: guestToken + TURN/STUN config
+
+    Note over P,D: 🎥 WebRTC Connection
+    P->>Jitsi: 25. Join room with token
+    D->>Jitsi: Already in room
+    Jitsi->>Jitsi: 26. WebRTC handshake (STUN/TURN)
+    Jitsi-->>P: P2P connection established
+    Jitsi-->>D: P2P connection established
+    Note over P,D: Audio/Video streaming (encrypted)
+
+    D->>VS: 27. PUT /video-call/rooms/{id}/end
+    VS->>Jitsi: Stop & save recording
+    Jitsi-->>VS: recordingUrl
+    VS->>DB: 28. UPDATE video_call_rooms<br/>(duration, recording_url)
+    VS->>WS: 29. Broadcast call_ended
+    WS->>P: Call ended notification
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <h3>📋 Chat Flow Steps (14 Steps)</h3>
+                        <ol>
+                            <li><strong>Create Conversation:</strong> Bệnh nhân chọn bác sĩ và gửi tin nhắn đầu tiên</li>
+                            <li><strong>Database Record:</strong> Tạo record trong bảng conversations</li>
+                            <li><strong>Notify Doctor:</strong> Gửi notification đến bác sĩ (WebSocket + Push)</li>
+                            <li><strong>WebSocket Connect:</strong> Cả hai kết nối WebSocket để nhắn tin real-time</li>
+                            <li><strong>Send Message:</strong> Gửi tin nhắn qua WebSocket event</li>
+                            <li><strong>Save to DB:</strong> Lưu tin nhắn vào chat_messages table</li>
+                            <li><strong>Broadcast:</strong> Broadcast đến người nhận qua WebSocket</li>
+                            <li><strong>Typing Indicator:</strong> Hiển thị "đang gõ..." khi có người gõ</li>
+                            <li><strong>Read Receipt:</strong> Đánh dấu tin nhắn đã đọc</li>
+                            <li><strong>File Upload:</strong> Upload file lên S3 storage</li>
+                            <li><strong>File URL:</strong> Lưu URL file vào database</li>
+                            <li><strong>File Broadcast:</strong> Gửi thông báo file mới đến người nhận</li>
+                            <li><strong>File Download:</strong> Người nhận download file từ CDN</li>
+                            <li><strong>Message History:</strong> Load lịch sử tin nhắn khi vào conversation</li>
+                        </ol>
+                    </div>
+
+                    <div class="mt-2">
+                        <h3>📞 Video Call Flow Steps (15 Steps)</h3>
+                        <ol>
+                            <li><strong>Create Room:</strong> Bác sĩ tạo phòng video call</li>
+                            <li><strong>Initialize Jitsi:</strong> Khởi tạo room trên Jitsi Meet server</li>
+                            <li><strong>Generate Tokens:</strong> Tạo hostToken và guestToken (JWT)</li>
+                            <li><strong>Send Invitation:</strong> Gửi invite đến bệnh nhân qua WebSocket</li>
+                            <li><strong>Push Notification:</strong> Gửi push notification "Incoming call"</li>
+                            <li><strong>Get Token:</strong> Bệnh nhân lấy token để join room</li>
+                            <li><strong>TURN/STUN Config:</strong> Nhận cấu hình TURN/STUN servers</li>
+                            <li><strong>Join Room:</strong> Cả hai join room với token riêng</li>
+                            <li><strong>WebRTC Handshake:</strong> Thiết lập P2P connection (STUN/TURN)</li>
+                            <li><strong>Media Stream:</strong> Bật camera/microphone và stream</li>
+                            <li><strong>Audio/Video:</strong> Truyền audio/video qua WebRTC (encrypted)</li>
+                            <li><strong>Recording:</strong> Optional - record cuộc gọi (nếu được phép)</li>
+                            <li><strong>End Call:</strong> Bác sĩ kết thúc cuộc gọi</li>
+                            <li><strong>Save Recording:</strong> Lưu file recording vào S3</li>
+                            <li><strong>Update History:</strong> Cập nhật lịch sử cuộc gọi vào database</li>
+                        </ol>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Key Features:</strong>
+                        <ul>
+                            <li><strong>Real-time:</strong> WebSocket cho chat, < 100ms latency</li>
+                            <li><strong>P2P Video:</strong> WebRTC direct connection, 1280x720 HD</li>
+                            <li><strong>File Sharing:</strong> Images, PDFs (medical reports)</li>
+                            <li><strong>Recording:</strong> Optional call recording cho medical records</li>
+                            <li><strong>Encryption:</strong> TLS 1.3 + DTLS-SRTP cho video</li>
+                            <li><strong>Scalable:</strong> Redis PubSub cho 10,000+ concurrent connections</li>
+                        </ul>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <caption>Technology Stack</caption>
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Technology</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>WebSocket</td>
+                                    <td>Socket.IO / Spring WebSocket</td>
+                                    <td>Real-time messaging</td>
+                                </tr>
+                                <tr>
+                                    <td>Video Call</td>
+                                    <td>WebRTC + Jitsi Meet</td>
+                                    <td>P2P audio/video streaming</td>
+                                </tr>
+                                <tr>
+                                    <td>Scaling</td>
+                                    <td>Redis PubSub</td>
+                                    <td>Horizontal WebSocket scaling</td>
+                                </tr>
+                                <tr>
+                                    <td>File Storage</td>
+                                    <td>AWS S3 / MinIO</td>
+                                    <td>Store images, documents</td>
+                                </tr>
+                                <tr>
+                                    <td>TURN/STUN</td>
+                                    <td>Coturn Server</td>
+                                    <td>NAT traversal for WebRTC</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pharmacy Order Flow -->
+            <section id="pharmacy" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">7. Pharmacy Order Flow (11 Steps)</h2>
+                        <span class="card-badge">E-Commerce</span>
+                    </div>
+
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant U as User App
+    participant PS as Pharmacy Service
+    participant INV as Inventory Service
+    participant CART as Cart Service
+    participant PAY as Payment Service
+    participant VNPAY as VNPay Gateway
+    participant SHIP as Shipping Service
+    participant DB as Database
+
+    Note over U,DB: 🔍 Product Search & Browse
+    U->>PS: 1. GET /products?category=OTC&search=paracetamol
+    PS->>DB: 2. Query products table
+    DB-->>PS: Product list
+    PS-->>U: {products: [name, price, stock, image]}
+
+    U->>PS: 3. GET /products/{id}
+    PS->>DB: 4. Get product details
+    DB-->>PS: Full product info
+    PS-->>U: {description, ingredients, usage, reviews}
+
+    Note over U,DB: 🛒 Add to Cart
+    U->>CART: 5. POST /cart/add<br/>{productId, quantity}
+    CART->>INV: 6. Check stock availability
+    INV->>DB: Query stock_quantity
+    DB-->>INV: stock = 500
+    INV-->>CART: Available: true
+    CART->>DB: 7. INSERT/UPDATE cart_items
+    CART-->>U: Cart updated (3 items, total: 350,000đ)
+
+    U->>CART: 8. GET /cart
+    CART->>DB: Get cart items
+    DB-->>CART: Cart data
+    CART-->>U: Cart details with products
+
+    Note over U,DB: 💳 Checkout & Payment
+    U->>PS: 9. POST /orders/create<br/>{cartId, address, phone}
+    PS->>CART: 10. Get cart items
+    CART-->>PS: Cart items
+    PS->>INV: 11. Reserve stock (temporary lock)
+    INV->>DB: UPDATE products SET reserved_stock += quantity
+    PS->>DB: 12. CREATE order + order_items
+    DB-->>PS: orderId
+    
+    PS->>PAY: 13. Create payment request
+    PAY->>VNPAY: 14. POST /create_payment_url<br/>{amount, orderInfo}
+    VNPAY-->>PAY: paymentUrl
+    PAY->>DB: 15. CREATE payment_transaction (PENDING)
+    PAY-->>PS: paymentUrl
+    PS-->>U: {orderId, paymentUrl, totalAmount}
+
+    U->>VNPAY: 16. Open payment URL in browser
+    Note over U,VNPAY: User enters card info & confirms
+    VNPAY->>PAY: 17. IPN callback (payment result)
+    PAY->>DB: 18. UPDATE payment_transaction (SUCCESS/FAILED)
+    
+    alt Payment Success
+        PAY->>PS: Payment confirmed
+        PS->>INV: 19. Deduct stock (commit reservation)
+        INV->>DB: UPDATE products SET stock -= quantity
+        PS->>DB: 20. UPDATE orders SET status = 'PROCESSING'
+        PS->>SHIP: 21. Create shipping request
+        SHIP->>DB: 22. INSERT INTO shipments
+        SHIP-->>PS: Tracking number
+        PS->>U: 23. Push notification "Đơn hàng đang xử lý"
+        
+        SHIP->>U: 24. "Đơn hàng đang giao" (3-5 days)
+        U->>PS: 25. GET /orders/{id}/tracking
+        PS->>SHIP: Get tracking status
+        SHIP-->>PS: {status: 'IN_TRANSIT', location: 'HCMC Hub'}
+        PS-->>U: Tracking details
+        
+        SHIP->>PS: 26. Delivery completed
+        PS->>DB: UPDATE orders SET status = 'DELIVERED'
+        PS->>U: Push "Đơn hàng đã giao thành công"
+    else Payment Failed
+        PAY->>PS: Payment failed
+        PS->>INV: Release stock reservation
+        INV->>DB: UPDATE products SET reserved_stock -= quantity
+        PS->>DB: UPDATE orders SET status = 'CANCELLED'
+        PS->>U: "Thanh toán thất bại, vui lòng thử lại"
+    end
+
+    Note over U,DB: ⭐ Post-Delivery
+    U->>PS: 27. POST /orders/{id}/review<br/>{rating, comment}
+    PS->>DB: 28. INSERT INTO product_reviews
+    PS-->>U: Review saved
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <h3>📋 Pharmacy Order Steps (28 Steps)</h3>
+                        <ol>
+                            <li><strong>Search Products:</strong> Tìm kiếm thuốc theo category, tên, hoạt chất</li>
+                            <li><strong>Filter & Sort:</strong> Lọc theo giá, rating, có kê đơn hay không</li>
+                            <li><strong>View Details:</strong> Xem chi tiết sản phẩm (thành phần, cách dùng, side effects)</li>
+                            <li><strong>Check Stock:</strong> Kiểm tra tồn kho real-time</li>
+                            <li><strong>Add to Cart:</strong> Thêm sản phẩm vào giỏ hàng</li>
+                            <li><strong>Cart Management:</strong> Sửa số lượng, xóa item khỏi giỏ</li>
+                            <li><strong>Apply Coupon:</strong> Nhập mã giảm giá (nếu có)</li>
+                            <li><strong>Calculate Total:</strong> Tính tổng tiền + phí ship</li>
+                            <li><strong>Enter Address:</strong> Nhập địa chỉ giao hàng</li>
+                            <li><strong>Prescription Check:</strong> Upload đơn thuốc nếu là thuốc kê đơn</li>
+                            <li><strong>Create Order:</strong> Tạo đơn hàng trong database</li>
+                            <li><strong>Reserve Stock:</strong> Lock tạm thời số lượng sản phẩm</li>
+                            <li><strong>Payment Gateway:</strong> Chuyển đến trang thanh toán VNPay</li>
+                            <li><strong>User Payment:</strong> Người dùng nhập thông tin thẻ</li>
+                            <li><strong>Payment Callback:</strong> VNPay gửi kết quả về hệ thống</li>
+                            <li><strong>Verify Signature:</strong> Xác thực chữ ký từ VNPay</li>
+                            <li><strong>Update Status:</strong> Cập nhật trạng thái thanh toán</li>
+                            <li><strong>Commit Stock:</strong> Trừ số lượng sản phẩm từ kho</li>
+                            <li><strong>Create Shipment:</strong> Tạo đơn vận chuyển (GHTK/GHN)</li>
+                            <li><strong>Generate Tracking:</strong> Tạo mã tracking để theo dõi</li>
+                            <li><strong>Notify User:</strong> Gửi thông báo "Đơn hàng đang xử lý"</li>
+                            <li><strong>Warehouse Pickup:</strong> Nhân viên kho chuẩn bị hàng</li>
+                            <li><strong>Shipper Pickup:</strong> Shipper lấy hàng</li>
+                            <li><strong>In Transit:</strong> Đơn hàng đang trên đường giao</li>
+                            <li><strong>Delivery:</strong> Giao hàng thành công</li>
+                            <li><strong>Update Delivered:</strong> Cập nhật trạng thái "Đã giao"</li>
+                            <li><strong>Request Review:</strong> Yêu cầu đánh giá sản phẩm</li>
+                            <li><strong>Save Review:</strong> Lưu rating và comment vào database</li>
+                        </ol>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Important Notes:</strong>
+                        <ul>
+                            <li><strong>Prescription Drugs:</strong> Thuốc kê đơn yêu cầu upload prescription image</li>
+                            <li><strong>Age Verification:</strong> Một số thuốc yêu cầu xác nhận tuổi > 18</li>
+                            <li><strong>Stock Management:</strong> Real-time stock update để tránh overselling</li>
+                            <li><strong>Payment Timeout:</strong> Đơn hàng tự động hủy sau 15 phút nếu không thanh toán</li>
+                            <li><strong>Return Policy:</strong> Thuốc không được trả lại trừ khi lỗi từ nhà thuốc</li>
+                        </ul>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <caption>Order Status Flow</caption>
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Estimated Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-warning">PENDING_PAYMENT</span></td>
+                                    <td>Chờ thanh toán</td>
+                                    <td>0-15 phút</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">PROCESSING</span></td>
+                                    <td>Đang chuẩn bị hàng</td>
+                                    <td>2-4 giờ</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-primary">SHIPPED</span></td>
+                                    <td>Đang vận chuyển</td>
+                                    <td>2-5 ngày</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-success">DELIVERED</span></td>
+                                    <td>Đã giao thành công</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-danger">CANCELLED</span></td>
+                                    <td>Đã hủy (thanh toán thất bại hoặc user hủy)</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Features:</strong>
+                        <ul>
+                            <li><strong>Product Categories:</strong> OTC (không kê đơn), Prescription (kê đơn), Supplements (thực phẩm chức năng)</li>
+                            <li><strong>Search:</strong> Full-text search on product name, ingredients, description</li>
+                            <li><strong>Filters:</strong> Category, price range, rating, availability</li>
+                            <li><strong>Cart Persistence:</strong> Giỏ hàng được lưu qua sessions</li>
+                            <li><strong>Multiple Payment:</strong> VNPay, MoMo, ZaloPay, COD</li>
+                            <li><strong>Shipping Integration:</strong> GHTK, GHN, Viettel Post</li>
+                            <li><strong>Real-time Tracking:</strong> Theo dõi đơn hàng real-time</li>
+                            <li><strong>Auto Reviews:</strong> Nhắc nhở đánh giá sau khi nhận hàng</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Management Flow -->
+            <section id="inventory" class="content-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">8. Inventory Management Flow (Quản lý xuất nhập kho)</h2>
+                        <span class="card-badge">Warehouse</span>
+                    </div>
+
+                    <h3>📦 Luồng Nhập Kho (Stock In)</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Admin as Warehouse Manager
+    participant System as Inventory System
+    participant DB as Database
+    participant Supplier as Supplier/NCC
+    participant Email as Email Service
+
+    Admin->>System: Tạo phiếu nhập kho
+    System->>System: Validate product & warehouse
+    System->>DB: Create inventory_transaction (PENDING)
+    System->>Admin: Return transaction code (IN-2025-001)
+    
+    Admin->>System: Upload hóa đơn/chứng từ
+    System->>DB: Store documents
+    
+    Admin->>System: Kiểm tra hàng nhập
+    System->>System: Verify quantity & quality
+    
+    Admin->>System: Approve phiếu nhập
+    System->>DB: Update transaction status = APPROVED
+    
+    Admin->>System: Complete nhập kho (thực tế)
+    System->>DB: Update inventory_items.quantity += quantity
+    System->>DB: Update transaction status = COMPLETED
+    System->>DB: Record quantity_before & quantity_after
+    
+    System->>System: Check if quantity > max_stock_level
+    alt Vượt ngưỡng tối đa
+        System->>Email: Alert: Tồn kho vượt mức
+    end
+    
+    System->>Admin: ✅ Nhập kho thành công
+                        </div>
+                    </div>
+
+                    <h3>📝 Chi tiết Luồng Nhập Kho (15 Steps)</h3>
+                    <ol>
+                        <li><strong>Tạo Phiếu Nhập:</strong> Warehouse Manager tạo phiếu nhập với thông tin: product_id, warehouse_id, quantity, unit_cost, supplier</li>
+                        <li><strong>Generate Transaction Code:</strong> Hệ thống tạo mã phiếu duy nhất: <code>IN-YYYY-MM-XXX</code></li>
+                        <li><strong>Validate Product:</strong> Kiểm tra sản phẩm tồn tại và đang active</li>
+                        <li><strong>Validate Warehouse:</strong> Kiểm tra kho hàng đang hoạt động</li>
+                        <li><strong>Check Capacity:</strong> Kiểm tra sức chứa kho: <code>current_stock + new_quantity ≤ capacity</code></li>
+                        <li><strong>Create Transaction Record:</strong> Lưu vào <code>inventory_transactions</code> với status = PENDING</li>
+                        <li><strong>Upload Documents:</strong> Admin upload hóa đơn VAT, phiếu xuất kho của NCC</li>
+                        <li><strong>Physical Inspection:</strong> Kiểm tra thực tế: số lượng, chất lượng, hạn sử dụng</li>
+                        <li><strong>QC Check:</strong> Quality Control đối với thuốc/thiết bị y tế</li>
+                        <li><strong>Approve Transaction:</strong> Manager phê duyệt phiếu (status = APPROVED)</li>
+                        <li><strong>Complete Transaction:</strong> Thực hiện nhập kho (status = COMPLETED)</li>
+                        <li><strong>Update Inventory:</strong> <code>inventory_items.quantity += transaction.quantity</code></li>
+                        <li><strong>Record Snapshot:</strong> Lưu quantity_before, quantity_after, last_restock_date</li>
+                        <li><strong>Check Thresholds:</strong> Kiểm tra ngưỡng max_stock_level</li>
+                        <li><strong>Send Notifications:</strong> Email + In-app notification cho Admin, Accountant</li>
+                    </ol>
+
+                    <h3>📤 Luồng Xuất Kho (Stock Out)</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Order as Order System
+    participant Inventory as Inventory System
+    participant Warehouse as Warehouse Staff
+    participant DB as Database
+    participant Shipping as Shipping Partner
+
+    Order->>Inventory: Request stock out (order_id)
+    Inventory->>DB: Check inventory_items.available_quantity
+    
+    alt Đủ hàng
+        Inventory->>DB: Create transaction (OUT, PENDING)
+        Inventory->>DB: Increase reserved_quantity
+        Inventory->>Order: ✅ Stock reserved
+        
+        Warehouse->>Inventory: Pick items from warehouse
+        Inventory->>DB: Update transaction = APPROVED
+        
+        Warehouse->>Inventory: Pack & confirm shipment
+        Inventory->>DB: Decrease quantity
+        Inventory->>DB: Decrease reserved_quantity
+        Inventory->>DB: Update transaction = COMPLETED
+        
+        Inventory->>Shipping: Create shipment
+        Shipping->>Warehouse: Pick up order
+        
+        Inventory->>Inventory: Check if quantity <= reorder_point
+        alt Cần đặt hàng lại
+            Inventory->>DB: Create auto reorder request
+        end
+        
+        Inventory->>Order: ✅ Xuất kho thành công
+    else Không đủ hàng
+        Inventory->>Order: ❌ Out of stock
+        Order->>Order: Cancel order / Backorder
+    end
+                        </div>
+                    </div>
+
+                    <h3>📝 Chi tiết Luồng Xuất Kho (18 Steps)</h3>
+                    <ol>
+                        <li><strong>Receive Order:</strong> Order Service gửi request xuất kho với order_id, items[]</li>
+                        <li><strong>Validate Order:</strong> Kiểm tra đơn hàng đã thanh toán (CONFIRMED)</li>
+                        <li><strong>Check Availability:</strong> Kiểm tra <code>available_quantity = quantity - reserved_quantity</code></li>
+                        <li><strong>Select Warehouse:</strong> Chọn kho gần khách hàng nhất có đủ hàng</li>
+                        <li><strong>Reserve Stock:</strong> <code>inventory_items.reserved_quantity += order_quantity</code></li>
+                        <li><strong>Create OUT Transaction:</strong> Tạo phiếu xuất với status = PENDING</li>
+                        <li><strong>Generate Pick List:</strong> In phiếu lấy hàng cho nhân viên kho</li>
+                        <li><strong>Warehouse Staff Pick:</strong> Nhân viên lấy hàng từ vị trí kho</li>
+                        <li><strong>Scan Barcode:</strong> Quét mã vạch để xác nhận đúng sản phẩm</li>
+                        <li><strong>Quality Check:</strong> Kiểm tra chất lượng, hạn sử dụng trước khi đóng gói</li>
+                        <li><strong>Pack Items:</strong> Đóng gói hàng hóa, ghi thông tin giao hàng</li>
+                        <li><strong>Approve Transaction:</strong> Supervisor phê duyệt phiếu xuất</li>
+                        <li><strong>Update Inventory:</strong> <code>inventory_items.quantity -= order_quantity</code></li>
+                        <li><strong>Release Reserved:</strong> <code>inventory_items.reserved_quantity -= order_quantity</code></li>
+                        <li><strong>Complete Transaction:</strong> Update status = COMPLETED, record timestamp</li>
+                        <li><strong>Create Shipment:</strong> Tích hợp GHTK/GHN để tạo vận đơn</li>
+                        <li><strong>Check Reorder Point:</strong> Nếu <code>quantity ≤ reorder_point</code> → Auto create purchase request</li>
+                        <li><strong>Notify Systems:</strong> Update Order Service, gửi tracking info cho khách hàng</li>
+                    </ol>
+
+                    <h3>🔄 Luồng Chuyển Kho (Warehouse Transfer)</h3>
+                    <div class="mermaid-container">
+                        <div class="mermaid">
+sequenceDiagram
+    participant Admin as Admin
+    participant System as Inventory System
+    participant WHFrom as Warehouse A (Hà Nội)
+    participant WHTo as Warehouse B (TP.HCM)
+    participant DB as Database
+    participant Shipper as Internal Shipper
+
+    Admin->>System: Create transfer request
+    System->>DB: Check WHFrom.available_quantity
+    
+    alt Đủ hàng chuyển
+        System->>DB: Create OUT transaction (WHFrom)
+        System->>DB: Create IN transaction (WHTo)
+        System->>DB: Both status = PENDING
+        
+        WHFrom->>System: Prepare items for transfer
+        System->>DB: Update OUT transaction = APPROVED
+        System->>DB: WHFrom.quantity -= transfer_qty
+        
+        Shipper->>WHFrom: Pick up items
+        Shipper->>WHTo: Deliver items
+        
+        WHTo->>System: Confirm receipt
+        System->>DB: Update IN transaction = COMPLETED
+        System->>DB: WHTo.quantity += transfer_qty
+        System->>DB: Update OUT transaction = COMPLETED
+        
+        System->>Admin: ✅ Chuyển kho thành công
+    else Không đủ hàng
+        System->>Admin: ❌ Insufficient stock in WHFrom
+    end
+                        </div>
+                    </div>
+
+                    <h3>📊 Inventory Status Flow</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Condition</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>quantity > min_stock_level</code></td>
+                                    <td><span class="badge badge-success">AVAILABLE</span></td>
+                                    <td>Bình thường, không có alert</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity ≤ min_stock_level</code></td>
+                                    <td><span class="badge badge-warning">LOW_STOCK</span></td>
+                                    <td>Email cảnh báo tồn kho thấp cho Manager</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity ≤ reorder_point</code></td>
+                                    <td><span class="badge badge-warning">REORDER_NEEDED</span></td>
+                                    <td>Tự động tạo đơn đặt hàng từ NCC</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity = 0</code></td>
+                                    <td><span class="badge badge-danger">OUT_OF_STOCK</span></td>
+                                    <td>Ẩn sản phẩm khỏi Store, email urgent alert</td>
+                                </tr>
+                                <tr>
+                                    <td><code>quantity > max_stock_level</code></td>
+                                    <td><span class="badge badge-info">OVERSTOCK</span></td>
+                                    <td>Alert: Tồn kho quá cao, cân nhắc giảm giá</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reserved_quantity > 0</code></td>
+                                    <td><span class="badge badge-info">RESERVED</span></td>
+                                    <td>Một phần đang được giữ cho đơn hàng</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>🔐 Transaction Status Flow</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Next Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-warning">PENDING</span></td>
+                                    <td>Phiếu mới tạo, chờ kiểm tra</td>
+                                    <td>APPROVED, CANCELLED</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">APPROVED</span></td>
+                                    <td>Đã phê duyệt, chờ thực hiện</td>
+                                    <td>COMPLETED, CANCELLED</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-success">COMPLETED</span></td>
+                                    <td>Đã hoàn thành, tồn kho đã cập nhật</td>
+                                    <td>-</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-danger">CANCELLED</span></td>
+                                    <td>Đã hủy (lỗi, sai sót)</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Business Rules:</strong>
+                        <ul>
+                            <li><strong>Approval Required:</strong> Phiếu xuất/nhập > 10 triệu VND hoặc quantity > 100 cần Manager approval</li>
+                            <li><strong>Auto Reserve:</strong> Khi user thêm vào giỏ hàng → tự động reserve tồn kho 15 phút</li>
+                            <li><strong>Auto Release:</strong> Sau 15 phút không checkout → tự động release reserved_quantity</li>
+                            <li><strong>Low Stock Alert:</strong> Email gửi mỗi ngày 8:00 AM cho các sản phẩm LOW_STOCK</li>
+                            <li><strong>Auto Reorder:</strong> Tự động tạo Purchase Order khi quantity ≤ reorder_point</li>
+                            <li><strong>Transfer Validation:</strong> Kho nguồn phải có đủ available_quantity để chuyển</li>
+                            <li><strong>Audit Trail:</strong> Mọi transaction đều ghi lại created_by, approved_by, timestamp</li>
+                            <li><strong>FIFO/FEFO:</strong> Xuất hàng theo nguyên tắc First Expired First Out (thuốc)</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>✅ Key Features:</strong>
+                        <ul>
+                            <li><strong>Multi-Warehouse Support:</strong> Quản lý nhiều kho (Trung tâm, Chi nhánh, Retail)</li>
+                            <li><strong>Real-time Stock Updates:</strong> Cập nhật tồn kho real-time qua WebSocket</li>
+                            <li><strong>Barcode Scanning:</strong> Quét mã vạch để nhập/xuất nhanh</li>
+                            <li><strong>Batch Management:</strong> Quản lý theo lô hàng (batch number, expiry date)</li>
+                            <li><strong>Location Tracking:</strong> Theo dõi vị trí lưu trữ trong kho (Rack-Shelf-Bin)</li>
+                            <li><strong>Automated Alerts:</strong> Cảnh báo tự động: LOW_STOCK, EXPIRED, OVERSTOCK</li>
+                            <li><strong>Reports & Analytics:</strong> Báo cáo tồn kho, xuất nhập, valuation</li>
+                            <li><strong>Integration:</strong> Tích hợp với Order System, Accounting, Shipping</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">© 2025 HealthAI App - Functional Flows Documentation</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../assets/js/main.js"></script>
+</body>
+</html>
